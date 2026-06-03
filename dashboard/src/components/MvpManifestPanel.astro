@@ -1,0 +1,177 @@
+---
+// MvpManifestPanel.astro — 2-col detail panel: left=problem+target+tech, right=manifest info+links; scoring via MvpScoringTable
+import MvpScoringTable from './MvpScoringTable.astro';
+
+interface MvpManifest {
+  id?: string;
+  name: string;
+  slug: string;
+  status: 'backlog' | 'building' | 'selected' | 'parked' | 'retired';
+  created: Date;
+  demo_date?: Date;
+  owner: string;
+  problem: string;
+  target_user?: string;
+  tech_stack: string[];
+  links?: { demo?: string; repo?: string; cover?: string };
+  scoring: Array<{ date: string; business: number; strategic: number; ux: number; tech: number; weighted: number; decision?: string }>;
+}
+
+interface Props { mvp: MvpManifest; }
+
+const { mvp } = Astro.props;
+
+const STATUS_LABELS: Record<string, string> = {
+  backlog: 'Tồn đọng', building: 'Đang build',
+  selected: 'Đã chọn', parked: 'Tạm dừng', retired: 'Đã loại',
+};
+---
+
+<div class="manifest-panel">
+
+  <div class="panel-main">
+    <section class="detail-section">
+      <h2 class="section-heading">Problem</h2>
+      <p class="section-text">{mvp.problem}</p>
+    </section>
+
+    {mvp.target_user && (
+      <section class="detail-section">
+        <h2 class="section-heading">Target User</h2>
+        <p class="section-text">{mvp.target_user}</p>
+      </section>
+    )}
+
+    <section class="detail-section">
+      <h2 class="section-heading">Tech Stack</h2>
+      <div class="tech-chips">
+        {mvp.tech_stack.map((t) => <span class="tech-chip">{t}</span>)}
+        {mvp.tech_stack.length === 0 && <span class="empty-tech">No tech stack specified</span>}
+      </div>
+    </section>
+
+    {mvp.scoring.length > 0 && (
+      <section class="detail-section">
+        <h2 class="section-heading">Scoring History</h2>
+        <MvpScoringTable scoring={mvp.scoring} />
+      </section>
+    )}
+  </div>
+
+  <aside class="panel-side">
+    <h2 class="section-heading">📋 Manifest</h2>
+    <ul class="info-list">
+      {mvp.id && (
+        <li class="info-row"><span class="info-lbl">ID</span><span class="info-val">{mvp.id}</span></li>
+      )}
+      <li class="info-row"><span class="info-lbl">Slug</span><code class="info-val info-code">{mvp.slug}</code></li>
+      <li class="info-row">
+        <span class="info-lbl">Status</span>
+        <span class={`status-badge status-badge--${mvp.status}`}>{STATUS_LABELS[mvp.status] ?? mvp.status}</span>
+      </li>
+      <li class="info-row"><span class="info-lbl">Owner</span><span class="info-val">{mvp.owner}</span></li>
+      <li class="info-row"><span class="info-lbl">Folder</span><code class="info-val info-code">products/{mvp.slug}/</code></li>
+    </ul>
+
+    {(mvp.links?.demo || mvp.links?.repo) && (
+      <div class="links-block">
+        <h3 class="links-heading">Links</h3>
+        {mvp.links?.demo && (
+          <a href={mvp.links.demo} class="ext-link" target="_blank" rel="noopener noreferrer">📺 Demo ↗</a>
+        )}
+        {mvp.links?.repo && (
+          <a href={mvp.links.repo} class="ext-link" target="_blank" rel="noopener noreferrer">📦 Repository ↗</a>
+        )}
+      </div>
+    )}
+  </aside>
+
+</div>
+
+<style>
+  .manifest-panel {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: var(--space-8pt-3);
+    align-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .manifest-panel { grid-template-columns: 1fr; }
+    .panel-side { order: -1; }
+  }
+
+  .detail-section { margin-bottom: var(--space-8pt-3); }
+
+  .section-heading {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--bsg-nl-600);
+    font-weight: 700;
+    margin: 0 0 var(--space-8pt-1);
+  }
+
+  .section-text { font-size: 14px; color: var(--bsg-nl-700); line-height: 1.6; margin: 0; }
+
+  .tech-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .tech-chip {
+    font-size: 12px;
+    background: var(--bsg-nl-100);
+    color: var(--bsg-nl-700);
+    border: 1px solid var(--bsg-nl-200);
+    border-radius: var(--radius-sm);
+    padding: 3px 10px;
+    font-weight: 500;
+  }
+
+  .empty-tech { font-size: 12px; color: var(--bsg-nl-500); font-style: italic; }
+
+  .panel-side {
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    border-radius: var(--radius);
+    padding: var(--space-8pt-3);
+  }
+
+  .info-list { list-style: none; margin: var(--space-8pt-2) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-8pt-1); }
+
+  .info-row {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-bottom: var(--space-8pt-1);
+    border-bottom: 1px solid var(--bsg-nl-100);
+  }
+
+  .info-row:last-child { border-bottom: none; }
+
+  .info-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--bsg-nl-500); font-weight: 600; }
+  .info-val { font-size: 13px; color: var(--bsg-nl-700); font-weight: 500; }
+  .info-code { font-size: 11px; font-family: ui-monospace, 'Cascadia Code', monospace; color: var(--bsg-nl-600); word-break: break-all; }
+
+  .status-badge {
+    font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; display: inline-block; align-self: flex-start;
+  }
+
+  .status-badge--backlog  { background: var(--badge-bg-backlog);  color: var(--badge-fg-backlog);  }
+  .status-badge--building { background: var(--badge-bg-building); color: var(--badge-fg-building); }
+  .status-badge--selected { background: var(--badge-bg-selected); color: var(--badge-fg-selected); }
+  .status-badge--parked   { background: var(--badge-bg-parked);   color: var(--badge-fg-parked);   }
+  .status-badge--retired  { background: var(--badge-bg-retired);  color: var(--badge-fg-retired);  }
+
+  .links-block { margin-top: var(--space-8pt-2); padding-top: var(--space-8pt-2); border-top: 1px solid var(--bsg-nl-100); }
+  .links-heading { font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--bsg-nl-500); font-weight: 700; margin: 0 0 var(--space-8pt-1); }
+
+  .ext-link {
+    display: block;
+    font-size: 13px;
+    color: var(--bsg-primary);
+    text-decoration: none;
+    padding: 4px 0;
+    font-weight: 500;
+  }
+
+  .ext-link:hover { text-decoration: underline; }
+</style>

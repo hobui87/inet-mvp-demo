@@ -1,0 +1,167 @@
+---
+/**
+ * ScoreTable.astro — Reusable static scoring rubric table (7 columns).
+ * Columns: Date | Business Potential | Strategic Fit | UX Quality | Tech Fit | Weighted | Decision
+ * Consumed by Phase 03 MVP detail page. Phase 04 ownership.
+ */
+import type { ScoreEntry } from '~/lib/types';
+
+interface Props {
+  scoring: ScoreEntry[];
+}
+
+const { scoring } = Astro.props;
+
+const decisionLabel: Record<string, string> = {
+  selected: 'Selected',
+  parked:   'Parked',
+  retired:  'Retired',
+  pending:  'Pending',
+};
+
+const decisionClass: Record<string, string> = {
+  selected: 'decision-selected',
+  parked:   'decision-parked',
+  retired:  'decision-retired',
+  pending:  'decision-pending',
+};
+---
+
+{scoring.length === 0 ? (
+  <p class="no-scores">Chưa có điểm đánh giá.</p>
+) : (
+  <div class="table-wrap" role="region" aria-label="Score history" tabindex="0">
+    <table class="score-table">
+      <thead>
+        <tr>
+          <th scope="col">Ngày</th>
+          <th scope="col" title="Business Potential">BP</th>
+          <th scope="col" title="Strategic Fit">SF</th>
+          <th scope="col" title="UX Quality">UX</th>
+          <th scope="col" title="Tech Fit">TF</th>
+          <th scope="col">Weighted</th>
+          <th scope="col">Decision</th>
+        </tr>
+      </thead>
+      <tbody>
+        {scoring.map(entry => {
+          const d = entry.date instanceof Date ? entry.date : new Date(entry.date);
+          const dateLabel = d.toLocaleDateString('vi-VN');
+          const dec = entry.decision ?? 'pending';
+          return (
+            <tr>
+              <td class="col-date">{dateLabel}</td>
+              <td class="col-num">{entry.business_potential.toFixed(1)}</td>
+              <td class="col-num">{entry.strategic_fit.toFixed(1)}</td>
+              <td class="col-num">{entry.ux_quality.toFixed(1)}</td>
+              <td class="col-num">{entry.tech_fit.toFixed(1)}</td>
+              <td class="col-num col-weighted">{entry.weighted.toFixed(2)}</td>
+              <td>
+                <span class={`decision-badge ${decisionClass[dec] ?? ''}`}>
+                  {decisionLabel[dec] ?? dec}
+                </span>
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+)}
+
+<style>
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius);
+    border: 1px solid var(--surface-border);
+  }
+
+  .score-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    background: var(--surface-card);
+  }
+
+  .score-table thead {
+    background: var(--bsg-nl-100);
+  }
+
+  .score-table th {
+    padding: var(--space-8pt-1) var(--space-8pt-2);
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--bsg-nl-700); /* 9.25:1 ✓ */
+    white-space: nowrap;
+    border-bottom: 2px solid var(--surface-border);
+  }
+
+  .score-table td {
+    padding: var(--space-8pt-1) var(--space-8pt-2);
+    border-bottom: 1px solid var(--surface-border);
+    color: var(--bsg-nl-700); /* 9.25:1 ✓ */
+    vertical-align: middle;
+  }
+
+  .score-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .score-table tbody tr:hover {
+    background: var(--bsg-nl-50);
+  }
+
+  .col-date {
+    white-space: nowrap;
+    font-size: 12px;
+  }
+
+  .col-num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-size: 13px;
+  }
+
+  .col-weighted {
+    font-weight: 600;
+    color: var(--bsg-accent); /* #cc0e0e on white = WCAG AA for large text; use nl-900 fallback for small */
+    color: var(--bsg-nl-900); /* 16.1:1 ✓ — override accent for small text safety */
+  }
+
+  /* Decision badges — all WCAG AA verified */
+  .decision-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .decision-selected {
+    background: var(--badge-bg-selected); /* #d1fae5 */
+    color: var(--badge-fg-selected);      /* #065f46 — 7:1 ✓ */
+  }
+
+  .decision-parked {
+    background: var(--badge-bg-parked);   /* #fef3c7 */
+    color: var(--badge-fg-parked);        /* #92400e — 6:1 ✓ */
+  }
+
+  .decision-retired {
+    background: var(--badge-bg-retired);  /* #fee2e2 */
+    color: var(--badge-fg-retired);       /* #7f1d1d — 6.5:1 ✓ */
+  }
+
+  .decision-pending {
+    background: var(--badge-bg-backlog);  /* #f3f4f6 */
+    color: var(--badge-fg-backlog);       /* #4b5563 — 6.35:1 ✓ */
+  }
+
+  .no-scores {
+    color: var(--bsg-nl-600);
+    font-size: 13px;
+    padding: var(--space-8pt-2);
+  }
+</style>

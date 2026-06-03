@@ -1,0 +1,168 @@
+---
+// MvpDetailHeader.astro — hero section for MVP detail page: cover bg, name, status badge, owner, dates
+interface MvpManifest {
+  id?: string;
+  name: string;
+  slug: string;
+  status: 'backlog' | 'building' | 'selected' | 'parked' | 'retired';
+  created: Date;
+  demo_date?: Date;
+  owner: string;
+  problem: string;
+  target_user?: string;
+  tech_stack: string[];
+  links?: { demo?: string; repo?: string; cover?: string };
+  scoring: Array<{ date: string; business: number; strategic: number; ux: number; tech: number; weighted: number; decision?: string }>;
+}
+
+interface Props {
+  mvp: MvpManifest;
+}
+
+const { mvp } = Astro.props;
+
+const STATUS_LABELS: Record<string, string> = {
+  backlog: 'Tồn đọng', building: 'Đang build',
+  selected: 'Đã chọn', parked: 'Tạm dừng', retired: 'Đã loại',
+};
+
+function fmtDate(d: Date | string | undefined) {
+  if (!d) return null;
+  return String(d).slice(0, 10);
+}
+
+const label = STATUS_LABELS[mvp.status] ?? mvp.status;
+const createdStr = fmtDate(mvp.created);
+const demoStr = fmtDate(mvp.demo_date);
+---
+
+<header class="detail-header">
+  <div class="cover-bg" aria-hidden="true"></div>
+  <div class="header-body">
+    <div class="header-top">
+      <span class={`status-badge status-badge--${mvp.status}`}>{label}</span>
+      {mvp.id && <span class="mvp-id">{mvp.id}</span>}
+    </div>
+    <h1 class="mvp-name">{mvp.name}</h1>
+    <div class="header-meta">
+      <span class="meta-item">
+        <span class="meta-lbl">Owner</span>
+        <span class="meta-val">{mvp.owner}</span>
+      </span>
+      {createdStr && (
+        <span class="meta-item">
+          <span class="meta-lbl">Created</span>
+          <time class="meta-val" datetime={createdStr}>{createdStr}</time>
+        </span>
+      )}
+      {demoStr && (
+        <span class="meta-item">
+          <span class="meta-lbl">Demo date</span>
+          <time class="meta-val" datetime={demoStr}>{demoStr}</time>
+        </span>
+      )}
+      <span class="meta-item">
+        <span class="meta-lbl">Source</span>
+        <code class="meta-val meta-path">products/{mvp.slug}/mvp.yaml</code>
+      </span>
+    </div>
+  </div>
+</header>
+
+<style>
+  .detail-header {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--surface-border);
+    box-shadow: var(--shadow);
+    margin-bottom: var(--space-8pt-3);
+  }
+
+  .cover-bg {
+    height: 120px;
+    background: linear-gradient(135deg, var(--bsg-primary) 0%, #0355b5 60%, #0a7ae8 100%);
+  }
+
+  .header-body {
+    padding: var(--space-8pt-4);
+    background: var(--surface-card);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8pt-2);
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8pt-1);
+    flex-wrap: wrap;
+  }
+
+  .mvp-id {
+    font-size: 12px;
+    color: var(--bsg-nl-600);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .mvp-name {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--bsg-nl-900);
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .header-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-8pt-2);
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .meta-lbl {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--bsg-nl-500);
+    font-weight: 600;
+  }
+
+  .meta-val {
+    font-size: 13px;
+    color: var(--bsg-nl-700);
+    font-weight: 500;
+  }
+
+  .meta-path {
+    font-size: 11px;
+    font-family: ui-monospace, 'Cascadia Code', monospace;
+    color: var(--bsg-nl-600);
+  }
+
+  /* === Status badges === */
+  .status-badge {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 999px;
+    display: inline-block;
+  }
+
+  .status-badge--backlog  { background: var(--badge-bg-backlog);  color: var(--badge-fg-backlog);  }
+  .status-badge--building { background: var(--badge-bg-building); color: var(--badge-fg-building); }
+  .status-badge--selected { background: var(--badge-bg-selected); color: var(--badge-fg-selected); }
+  .status-badge--parked   { background: var(--badge-bg-parked);   color: var(--badge-fg-parked);   }
+  .status-badge--retired  { background: var(--badge-bg-retired);  color: var(--badge-fg-retired);  }
+
+  @media (max-width: 600px) {
+    .mvp-name { font-size: 20px; }
+    .header-body { padding: var(--space-8pt-2); }
+  }
+</style>

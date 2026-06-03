@@ -1,0 +1,104 @@
+---
+// PipelineLane.astro — single kanban lane: header with count badge + MvpCard list + empty state
+import MvpCard from './MvpCard.astro';
+
+interface MvpManifest {
+  id?: string;
+  name: string;
+  slug: string;
+  status: 'backlog' | 'building' | 'selected' | 'parked' | 'retired';
+  created: Date;
+  demo_date?: Date;
+  owner: string;
+  problem: string;
+  target_user?: string;
+  tech_stack: string[];
+  links?: { demo?: string; repo?: string; cover?: string };
+  scoring: Array<{ date: string; business: number; strategic: number; ux: number; tech: number; weighted: number; decision?: string }>;
+}
+
+interface Props {
+  status: 'backlog' | 'building' | 'selected' | 'parked' | 'retired';
+  label: string;
+  mvps: MvpManifest[];
+}
+
+const { status, label, mvps } = Astro.props;
+---
+
+<div class={`lane lane--${status}`} data-status={status}>
+  <div class="lane-header">
+    <span class="lane-title">{label}</span>
+    <span class="lane-count" aria-label={`${mvps.length} MVPs`}>{mvps.length}</span>
+  </div>
+
+  <div class="lane-body">
+    {mvps.length === 0 ? (
+      <p class="empty-state">Chưa có MVP</p>
+    ) : (
+      mvps.map((mvp) => <MvpCard mvp={mvp} />)
+    )}
+  </div>
+</div>
+
+<style>
+  .lane {
+    background: var(--bsg-nl-50);
+    border-radius: var(--radius);
+    border: 1px solid var(--surface-border);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .lane-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-8pt-2) var(--space-8pt-2);
+    border-bottom: 1px solid var(--surface-border);
+    background: var(--surface-card);
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+
+  .lane-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--bsg-nl-700);
+  }
+
+  .lane-count {
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--bsg-nl-200);
+    color: var(--bsg-nl-600);
+    padding: 2px 8px;
+    border-radius: 999px;
+    min-width: 20px;
+    text-align: center;
+  }
+
+  .lane-body {
+    padding: var(--space-8pt-2);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8pt-1);
+    flex: 1;
+  }
+
+  .empty-state {
+    font-size: 12px;
+    color: var(--bsg-nl-500);
+    text-align: center;
+    padding: var(--space-8pt-3) 0;
+    margin: 0;
+    font-style: italic;
+  }
+
+  /* Lane accent left border per status */
+  .lane--backlog  { border-top: 3px solid var(--badge-fg-backlog);  }
+  .lane--building { border-top: 3px solid #d97706; }
+  .lane--selected { border-top: 3px solid var(--bsg-success); }
+  .lane--parked   { border-top: 3px solid #9ca3af; }
+  .lane--retired  { border-top: 3px solid var(--bsg-error); }
+</style>

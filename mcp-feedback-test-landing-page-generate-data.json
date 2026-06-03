@@ -1,0 +1,55 @@
+{
+  "data": {
+    "meta": {
+      "title": "iNET MCP Server — Kết nối AI với hệ thống thiết kế",
+      "description": "Model Context Protocol Server cho iNET Design System. 10 tools, 17+ resources, 8 prompts — kết nối AI với design tokens, components, themes.",
+      "url": "https://viui.inet.vn/ldp/mcp",
+      "og_image": "https://viui.inet.vn/brands/android-chrome-512x512.png",
+      "lang": "vi"
+    },
+    "brand": {
+      "name": "MCP SERVER",
+      "logo_url": "/brands/android-chrome-192x192.png",
+      "primary_color": "#024799",
+      "accent_color": "#cc0e0e"
+    },
+    "navbar": {
+      "items": [
+        {"label": "Vấn đề", "href": "#problem"},
+        {"label": "Tính năng", "href": "#features"},
+        {"label": "Demo", "href": "#demo"},
+        {"label": "Kiến trúc", "href": "#architecture"},
+        {"label": "Cài đặt", "href": "#setup"},
+        {"label": "FAQ", "href": "#faq"}
+      ],
+      "cta": {"label": "Bắt đầu", "href": "#setup"}
+    },
+    "hero": {
+      "headline": "MCP server — biến Design System thành ngôn ngữ chung",
+      "subheadline": "MCP kết nối AI trực tiếp với tokens, components và tài liệu thiết kế — không cần copy-paste.",
+      "stats": [
+        {"value": "10", "label": "Tools"},
+        {"value": "17+", "label": "Resources"},
+        {"value": "8", "label": "Prompts"}
+      ],
+      "cta_primary": {"label": "Bắt đầu ngay", "href": "#setup"},
+      "cta_secondary": {"label": "Xem tính năng", "href": "#features"},
+      "enable_3d": true
+    },
+    "footer": {
+      "brand_name": "MCP SERVER",
+      "brand_description": "iNET MCP Server cung cấp hạ tầng kết nối AI với design system.",
+      "link_groups": [
+        {
+          "heading": "Tài nguyên",
+          "links": [
+            {"label": "Storybook", "href": "https://viui.inet.vn"},
+            {"label": "MCP Endpoint", "href": "https://viui.inet.vn/mcp"}
+          ]
+        }
+      ],
+      "copyright": "Copyright &copy; 2007 iNET"
+    },
+    "feedback_endpoint": "/api/feedback"
+  }
+}

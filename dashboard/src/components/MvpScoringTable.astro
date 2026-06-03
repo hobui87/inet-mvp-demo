@@ -1,0 +1,138 @@
+---
+// MvpScoringTable.astro — inline scoring history table for MVP detail page (Phase 03 owned, no ScoreTable import)
+import type { ScoreEntry } from '~/lib/types';
+
+interface Props {
+  scoring: ScoreEntry[];
+}
+
+const { scoring } = Astro.props;
+
+const fmtDate = (d: Date | string): string => {
+  const dt = d instanceof Date ? d : new Date(d);
+  return dt.toISOString().slice(0, 10);
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  backlog: 'Tồn đọng', building: 'Đang build',
+  selected: 'Đã chọn', parked: 'Tạm dừng', retired: 'Đã loại',
+};
+---
+
+<div class="table-scroll">
+  <table class="score-table" aria-label="Scoring history">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th title="Business value 30%">Biz 30%</th>
+        <th title="Strategic fit 30%">Strat 30%</th>
+        <th title="UX feasibility 25%">UX 25%</th>
+        <th title="Tech complexity 15%">Tech 15%</th>
+        <th>Weighted</th>
+        <th>Decision</th>
+      </tr>
+    </thead>
+    <tbody>
+      {scoring.map((row) => {
+        const dateStr = fmtDate(row.date);
+        return (
+        <tr>
+          <td><time datetime={dateStr}>{dateStr}</time></td>
+          <td class="score-cell">
+            {row.business_potential}
+            <span class="score-bar"><span class="score-fill" style={`width:${(row.business_potential / 5) * 100}%`}></span></span>
+          </td>
+          <td class="score-cell">
+            {row.strategic_fit}
+            <span class="score-bar"><span class="score-fill" style={`width:${(row.strategic_fit / 5) * 100}%`}></span></span>
+          </td>
+          <td class="score-cell">
+            {row.ux_quality}
+            <span class="score-bar"><span class="score-fill" style={`width:${(row.ux_quality / 5) * 100}%`}></span></span>
+          </td>
+          <td class="score-cell">
+            {row.tech_fit}
+            <span class="score-bar"><span class="score-fill" style={`width:${(row.tech_fit / 5) * 100}%`}></span></span>
+          </td>
+          <td class="weighted-cell"><strong>{Number(row.weighted).toFixed(2)}</strong></td>
+          <td>
+            {row.decision && (
+              <span class={`decision-badge decision-badge--${row.decision}`}>
+                {STATUS_LABELS[row.decision] ?? row.decision}
+              </span>
+            )}
+          </td>
+        </tr>
+        );
+      })}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .table-scroll { overflow-x: auto; }
+
+  .score-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    color: var(--bsg-nl-700);
+  }
+
+  .score-table th {
+    background: var(--bsg-nl-50);
+    color: var(--bsg-nl-600);
+    font-weight: 600;
+    text-align: left;
+    padding: 6px 10px;
+    border-bottom: 2px solid var(--bsg-nl-200);
+    white-space: nowrap;
+  }
+
+  .score-table td {
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--bsg-nl-100);
+    vertical-align: middle;
+  }
+
+  .score-table tr:last-child td { border-bottom: none; }
+
+  .score-cell {
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .score-bar {
+    display: inline-block;
+    width: 40px;
+    height: 4px;
+    background: var(--bsg-nl-200);
+    border-radius: 2px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .score-fill {
+    display: block;
+    height: 100%;
+    background: var(--bsg-primary);
+    border-radius: 2px;
+  }
+
+  .weighted-cell { color: var(--bsg-nl-900); }
+
+  .decision-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+
+  .decision-badge--selected { background: var(--badge-bg-selected); color: var(--badge-fg-selected); }
+  .decision-badge--parked   { background: var(--badge-bg-parked);   color: var(--badge-fg-parked);   }
+  .decision-badge--building { background: var(--badge-bg-building); color: var(--badge-fg-building); }
+  .decision-badge--retired  { background: var(--badge-bg-retired);  color: var(--badge-fg-retired);  }
+  .decision-badge--backlog  { background: var(--badge-bg-backlog);  color: var(--badge-fg-backlog);  }
+</style>

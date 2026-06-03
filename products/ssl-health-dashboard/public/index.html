@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SSL Certificate Health Dashboard</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%2322c55e' d='M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z'/%3E%3C/svg%3E" />
+  <meta name="description" content="Kiểm tra SSL certificate của nhiều domain cùng lúc — score, grade, ngày hết hạn, issuer." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="ssl-dashboard-styles.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+  </style>
+</head>
+<body>
+
+<!-- ONE Series Brand Bar -->
+<div class="one-series-bar" style="background:#024799;color:#fff;font-family:'Inter',system-ui,sans-serif;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+  <div style="max-width:1100px;margin:0 auto;padding:0 24px;height:40px;display:flex;align-items:center;justify-content:space-between;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="2" y="2" width="9" height="9" rx="1.5"/><rect x="13" y="2" width="9" height="9" rx="1.5"/><rect x="2" y="13" width="9" height="9" rx="1.5"/><rect x="13" y="13" width="9" height="9" rx="1.5"/></svg>
+      <span style="font-weight:700;letter-spacing:0.8px;font-size:12px;text-transform:uppercase;opacity:0.95;">ONE Series</span>
+      <span style="font-size:10px;opacity:0.45;">by iNET</span>
+    </div>
+    <nav style="display:flex;gap:2px;" aria-label="ONE Series products">
+      <a href="/product/domain-reputation/" style="color:rgba(255,255,255,0.6);text-decoration:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:500;" title="N5 — Domain Reputation Monitor">N5 · Domain</a>
+      <a href="/product/email-auth-checker/" style="color:rgba(255,255,255,0.6);text-decoration:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:500;" title="N22 — Email Auth Checker">N22 · Email</a>
+      <a href="/product/ssl-health-dashboard/" style="color:#fff;text-decoration:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:600;background:rgba(255,255,255,0.18);" title="SSL Certificate Health Dashboard">SSL · Certs</a>
+    </nav>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="container">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-shield">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+          </svg>
+        </span>
+        <span class="logo-brand">iNET</span>
+        <span class="logo-title">SSL Certificate Health Dashboard</span>
+      </div>
+      <p class="logo-sub">Scan SSL · Score 0–100 · Grade A–F</p>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- Input section -->
+  <section class="scan-section" aria-label="Nhập danh sách domain cần kiểm tra SSL">
+    <div class="scan-header">
+      <h2 class="scan-title">Kiểm tra SSL Certificate</h2>
+      <p class="scan-hint">Mỗi dòng một domain — tối đa 10 domain mỗi lần quét</p>
+    </div>
+
+    <div class="scan-body">
+      <div class="textarea-wrap">
+        <label for="domains-input" class="sr-only">Danh sách domain</label>
+        <textarea
+          id="domains-input"
+          class="domains-textarea"
+          rows="5"
+          spellcheck="false"
+          autocapitalize="none"
+          placeholder="inet.vn&#10;google.com&#10;expired.badssl.com"
+        >inet.vn
+google.com
+expired.badssl.com</textarea>
+        <span class="domain-counter" id="domain-counter">3 domain</span>
+      </div>
+
+      <div class="scan-actions">
+        <button id="btn-clear" class="btn-ghost" type="button">Xóa</button>
+        <button id="btn-scan" class="btn-scan-primary" type="button">
+          <svg class="icon-scan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+            <polyline points="9 12 11 14 15 10"/>
+          </svg>
+          <span id="btn-label">Scan All</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Error banner -->
+  <div id="error-banner" class="error-banner" role="alert" aria-live="assertive" hidden>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span id="error-msg">Không thể kết nối đến server.</span>
+    <button id="btn-retry" class="btn-retry">Thử lại</button>
+  </div>
+
+  <!-- Loading skeleton -->
+  <div id="loading" class="loading-state" hidden aria-live="polite" aria-label="Đang quét SSL...">
+    <div class="spinner"></div>
+    <span>Đang kiểm tra SSL certificates…</span>
+  </div>
+
+  <!-- Results area -->
+  <div id="results-area" hidden aria-live="polite">
+
+    <!-- Summary bar -->
+    <div class="summary-bar" id="summary-bar">
+      <span class="summary-item">
+        <span class="summary-dot dot-all"></span>
+        <span id="sum-total">0</span> domain đã quét
+      </span>
+      <span class="summary-item">
+        <span class="summary-dot dot-safe"></span>
+        <span id="sum-safe">0</span> an toàn
+      </span>
+      <span class="summary-item">
+        <span class="summary-dot dot-warn"></span>
+        <span id="sum-warn">0</span> cảnh báo
+      </span>
+      <span class="summary-item">
+        <span class="summary-dot dot-expired"></span>
+        <span id="sum-expired">0</span> hết hạn / lỗi
+      </span>
+      <span class="summary-elapsed" id="sum-elapsed"></span>
+    </div>
+
+    <!-- Cards grid -->
+    <div class="results-grid" id="results-grid" role="list"></div>
+
+  </div>
+
+  <!-- Empty state -->
+  <div id="empty-state" class="empty-state" hidden>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48" aria-hidden="true">
+      <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+    </svg>
+    <p>Nhập domain và nhấn "Scan All" để bắt đầu kiểm tra.</p>
+  </div>
+
+</main>
+
+<div id="a11y-announce" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+<script type="module" src="ssl-dashboard-app.js"></script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+---
+// PipelineStatsBar.astro — summary stat pills for pipeline kanban header (total, building, selected, avg score)
+interface Props {
+  total: number;
+  building: number;
+  selected: number;
+  avgScore: string;
+}
+
+const { total, building, selected, avgScore } = Astro.props;
+
+const stats = [
+  { val: total,    lbl: 'Total MVPs' },
+  { val: building, lbl: 'Building'   },
+  { val: selected, lbl: 'Selected'   },
+  { val: avgScore, lbl: 'Avg Score'  },
+];
+---
+
+<div class="stats-bar" aria-label="Pipeline statistics">
+  {stats.map(({ val, lbl }) => (
+    <div class="stat">
+      <span class="stat-val">{val}</span>
+      <span class="stat-lbl">{lbl}</span>
+    </div>
+  ))}
+</div>
+
+<style>
+  .stats-bar { display: flex; gap: var(--space-8pt-2); flex-wrap: wrap; }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    border-radius: var(--radius);
+    padding: var(--space-8pt-1) var(--space-8pt-2);
+    min-width: 72px;
+  }
+
+  .stat-val { font-size: 20px; font-weight: 700; color: var(--bsg-primary); line-height: 1; }
+  .stat-lbl { font-size: 10px; color: var(--bsg-nl-600); text-transform: uppercase; letter-spacing: 0.4px; margin-top: 2px; }
+</style>

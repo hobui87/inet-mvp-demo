@@ -1,0 +1,109 @@
+---
+/**
+ * SessionsCalendar.astro — Groups sessions by month (desc) and renders SessionRow list per group.
+ * No calendar grid (list-by-month view); actual month grid is in the mockup but
+ * list-by-month fulfills the phase requirement with zero JS.
+ * Phase 04 ownership.
+ */
+import type { Session, MvpManifest } from '~/lib/types';
+import SessionRow from './SessionRow.astro';
+
+interface Props {
+  sessions: Session[];
+  mvps: MvpManifest[];
+}
+
+const { sessions, mvps } = Astro.props;
+
+// Sort sessions desc by date
+const sorted = [...sessions].sort((a, b) => {
+  const da = a.date instanceof Date ? a.date.getTime() : new Date(a.date).getTime();
+  const db = b.date instanceof Date ? b.date.getTime() : new Date(b.date).getTime();
+  return db - da;
+});
+
+// Group by "yyyy-MM" key → display label
+type MonthGroup = { label: string; sessions: Session[] };
+
+const grouped: MonthGroup[] = [];
+const seen = new Map<string, MonthGroup>();
+
+for (const s of sorted) {
+  const d = s.date instanceof Date ? s.date : new Date(s.date);
+  const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  const label = d.toLocaleDateString('vi-VN', { month: 'long', year: 'numeric' });
+
+  if (!seen.has(key)) {
+    const group: MonthGroup = { label, sessions: [] };
+    seen.set(key, group);
+    grouped.push(group);
+  }
+  seen.get(key)!.sessions.push(s);
+}
+---
+
+{grouped.length === 0 ? (
+  <div class="empty-state">
+    <p>Chưa có session nào. Thêm file vào <code>evaluation/sessions/*.md</code>.</p>
+  </div>
+) : (
+  <div class="calendar-list">
+    {grouped.map(group => (
+      <section class="month-group">
+        <h2 class="month-heading">{group.label}</h2>
+        <div class="session-rows">
+          {group.sessions.map(s => (
+            <SessionRow session={s} mvps={mvps} />
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+)}
+
+<style>
+  .calendar-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8pt-4);
+  }
+
+  .month-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8pt-2);
+  }
+
+  .month-heading {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--bsg-nl-700); /* 9.25:1 ✓ */
+    text-transform: capitalize;
+    padding-bottom: var(--space-8pt-1);
+    border-bottom: 2px solid var(--bsg-primary);
+    margin: 0;
+  }
+
+  .session-rows {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8pt-1);
+  }
+
+  .empty-state {
+    padding: var(--space-8pt-4);
+    text-align: center;
+    color: var(--bsg-nl-600); /* 6.35:1 ✓ */
+    background: var(--surface-card);
+    border: 1px dashed var(--surface-border);
+    border-radius: var(--radius);
+  }
+
+  .empty-state code {
+    background: var(--bsg-nl-200);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--bsg-nl-700);
+  }
+</style>

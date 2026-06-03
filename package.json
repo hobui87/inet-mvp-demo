@@ -1,0 +1,17 @@
+{
+  "name": "weekly-friday-training",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start:demo": "powershell -ExecutionPolicy Bypass -File scripts/start-friday-demo-server-and-cloudflared-tunnel.ps1",
+    "dev:hub": "node --watch friday-demo-hub-server-plans-static-and-product-proxy.js",
+    "dev:dashboard": "pnpm --filter inet-mvp-dashboard dev",
+    "dev:domain-rep": "pnpm --filter domain-reputation-monitor dev",
+    "dev:email-auth": "pnpm --filter email-auth-checker dev",
+    "dev:ssl-health": "pnpm --filter ssl-health-dashboard dev"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.7",
+    "hono": "^4.7.10"
+  }
+}

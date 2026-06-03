@@ -1,0 +1,41 @@
+
+> inet-mvp-dashboard@0.1.0 build
+> astro build
+
+[2m16:04:49[22m [34m[content][39m Syncing content
+[2m16:04:49[22m [34m[content][39m Synced content
+[2m16:04:49[22m [34m[types][39m Generated [2m1.01s[22m
+[2m16:04:49[22m [34m[build][39m output: [34m"static"[39m
+[2m16:04:49[22m [34m[build][39m mode: [34m"static"[39m
+[2m16:04:49[22m [34m[build][39m directory: [34mF:\iNET-Work\GitlabiNET\2.build-project--i-design-system\weekly-friday-training\dashboard\dist\[39m
+[2m16:04:49[22m [34m[build][39m Collecting build info...
+[2m16:04:49[22m [34m[build][39m [32m✓ Completed in 1.07s.[39m
+[2m16:04:49[22m [34m[build][39m Building static entrypoints...
+[2m16:04:51[22m [34m[vite][39m [32m✓ built in 2.27s[39m
+[2m16:04:51[22m [34m[build][39m [32m✓ Completed in 2.34s.[39m
+
+[42m[30m building client (vite) [39m[49m
+[2m16:04:51[22m [34m[vite][39m transforming...
+[2m16:04:52[22m [34m[vite][39m [32m✓[39m 4 modules transformed.
+[2m16:04:52[22m [34m[vite][39m rendering chunks...
+[2m16:04:52[22m [34m[vite][39m computing gzip size...
+[2m16:04:52[22m [34m[vite][39m [2mdist/[22m[36m_astro/ScoreChart.astro_astro_type_script_index_0_lang.DgR08nV4.js  [39m[1m[2m207.69 kB[22m[1m[22m[2m │ gzip: 71.15 kB[22m
+[2m16:04:52[22m [34m[vite][39m [32m✓ built in 995ms[39m
+
+[42m[30m generating static routes [39m[49m
+[2m16:04:52[22m [32m▶[39m src/pages/mvp/[slug].astro
+[2m16:04:52[22m   [34m├─[39m [2m/mvp/domain-bulk-manager/index.html[22m [2m(+13ms)[22m 
+[2m16:04:52[22m   [34m├─[39m [2m/mvp/dns-proxy-companion/index.html[22m [2m(+3ms)[22m 
+[2m16:04:52[22m   [34m└─[39m [2m/mvp/auto-renew-reminder/index.html[22m [2m(+4ms)[22m 
+[2m16:04:53[22m [32m▶[39m src/pages/sessions/[date].astro
+[2m16:04:53[22m   [34m└─[39m [2m/sessions/2026-05-29/index.html[22m [2m(+4ms)[22m 
+[2m16:04:53[22m [32m▶[39m src/pages/sessions/index.astro
+[2m16:04:53[22m   [34m└─[39m [2m/sessions/index.html[22m [2m(+7ms)[22m 
+[2m16:04:53[22m [32m▶[39m src/pages/tech-catalog.astro
+[2m16:04:53[22m   [34m└─[39m [2m/tech-catalog/index.html[22m [2m(+6ms)[22m 
+[2m16:04:53[22m [32m▶[39m src/pages/index.astro
+[2m16:04:53[22m   [34m└─[39m [2m/index.html[22m [2m(+4ms)[22m 
+[2m16:04:53[22m [32m✓ Completed in 85ms.
+[39m
+[2m16:04:53[22m [34m[build][39m 7 page(s) built in [1m4.53s[22m
+[2m16:04:53[22m [34m[build][39m [1mComplete![22m

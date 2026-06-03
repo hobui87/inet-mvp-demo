@@ -1,0 +1,16 @@
+id: MVP-008
+name: Domain Bulk Manager
+slug: domain-bulk-manager
+status: backlog
+created: 2026-05-22
+owner: hobv@inet.vn
+problem: |
+  Customer có >50 domain cần bulk operations (transfer, DNS update, contact update)
+  nhưng iNET portal chỉ hỗ trợ single-domain workflow. Reseller và enterprise
+  mất hàng giờ thực hiện thủ công từng domain một.
+target_user: Resellers + enterprise customers
+tech_stack:
+  - next.js@15
+  - typescript
+  - postgres
+scoring: []

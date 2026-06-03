@@ -1,0 +1,168 @@
+---
+import '../styles/tokens.css';
+import '../styles/base.css';
+
+interface Props {
+  title?: string;
+}
+
+const { title = 'iNET Innovation Lab — MVP Dashboard' } = Astro.props;
+const buildDate = new Date().toISOString().slice(0, 10);
+---
+
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+  </head>
+  <body>
+
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-name">iNET <em>Innovation Lab</em></span>
+        <span class="brand-sub">MVP Dashboard · weekly-friday-training</span>
+      </div>
+
+      <nav class="nav" aria-label="Main navigation">
+        <a href="/">Pipeline</a>
+        <a href="/sessions/">Sessions</a>
+        <a href="/tech-catalog/">Tech</a>
+      </nav>
+
+      <div class="topbar-meta">
+        Build: {buildDate}<br />
+        <small>Astro + Markdown</small>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer>
+      <p>
+        <strong>iNET Innovation Lab</strong> · MVP Dashboard ·
+        ViUI brand tokens (<code>#024799</code> / <code>#cc0e0e</code> / 8pt grid)
+      </p>
+      <p>Build: <code>{buildDate}</code> · Source: <code>pipeline/*.md</code> + <code>products/*/mvp.yaml</code></p>
+    </footer>
+
+  </body>
+</html>
+
+<style>
+  /* === Topbar === */
+  .topbar {
+    background: var(--topbar-bg);
+    color: var(--topbar-fg);
+    padding: 14px var(--space-8pt-4);
+    display: flex;
+    align-items: center;
+    gap: var(--space-8pt-3);
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .brand {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brand-name {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+
+  .brand-name em {
+    font-style: normal;
+    color: #7fb3f5;
+  }
+
+  .brand-sub {
+    font-size: 11px;
+    opacity: 0.7;
+    font-weight: 400;
+    margin-top: 2px;
+  }
+
+  .nav {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+    margin-left: var(--space-8pt-3);
+  }
+
+  .nav a {
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.15s;
+  }
+
+  .nav a:hover {
+    background: var(--topbar-nav-hover);
+    color: var(--topbar-fg);
+    text-decoration: none;
+  }
+
+  .nav a[aria-current="page"] {
+    background: var(--topbar-nav-active);
+    color: var(--topbar-fg);
+  }
+
+  .topbar-meta {
+    font-size: 11px;
+    opacity: 0.7;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  /* === Main === */
+  main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--space-8pt-4) var(--space-8pt-3);
+  }
+
+  /* === Footer === */
+  footer {
+    max-width: 1400px;
+    margin: var(--space-8pt-5) auto var(--space-8pt-4);
+    padding: var(--space-8pt-3);
+    text-align: center;
+    font-size: 11px;
+    color: var(--bsg-nl-600);
+    border-top: 1px dashed var(--bsg-nl-300);
+  }
+
+  footer code {
+    background: var(--bsg-nl-200);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    color: var(--bsg-nl-700);
+  }
+
+  footer p + p {
+    margin-top: var(--space-8pt-1);
+  }
+
+  /* === Responsive === */
+  @media (max-width: 600px) {
+    .nav {
+      display: none;
+    }
+
+    .topbar {
+      padding: 12px var(--space-8pt-2);
+    }
+  }
+</style>

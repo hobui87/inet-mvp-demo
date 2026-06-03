@@ -1,0 +1,135 @@
+---
+// PipelineBoard.astro — 5-lane kanban grid + invalid manifests warning section above lanes
+import PipelineLane from './PipelineLane.astro';
+import MvpCardInvalid from './MvpCardInvalid.astro';
+import PipelineStatsBar from './PipelineStatsBar.astro';
+
+interface MvpManifest {
+  id?: string;
+  name: string;
+  slug: string;
+  status: 'backlog' | 'building' | 'selected' | 'parked' | 'retired';
+  created: Date;
+  demo_date?: Date;
+  owner: string;
+  problem: string;
+  target_user?: string;
+  tech_stack: string[];
+  links?: { demo?: string; repo?: string; cover?: string };
+  scoring: Array<{ date: string; business: number; strategic: number; ux: number; tech: number; weighted: number; decision?: string }>;
+}
+
+interface InvalidManifest {
+  __invalid: true;
+  slug: string;
+  filePath: string;
+  errors: string[];
+}
+
+interface Props {
+  mvps: MvpManifest[];
+  invalidMvps: InvalidManifest[];
+}
+
+const { mvps, invalidMvps } = Astro.props;
+
+const LANES: Array<{ status: MvpManifest['status']; label: string }> = [
+  { status: 'backlog',  label: '📋 Tồn đọng'  },
+  { status: 'building', label: '🔨 Đang build' },
+  { status: 'selected', label: '⭐ Đã chọn'   },
+  { status: 'parked',   label: '⏸ Tạm dừng'  },
+  { status: 'retired',  label: '🗄 Đã loại'   },
+];
+
+const scores = mvps.flatMap((m) => m.scoring.map((s) => s.weighted)).filter(Boolean);
+const avgScore = scores.length
+  ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1)
+  : '—';
+---
+
+<div class="board">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">MVP Pipeline</h1>
+      <p class="page-sub">Vòng đời sản phẩm từ ý tưởng đến launch hoặc retire</p>
+    </div>
+    <PipelineStatsBar
+      total={mvps.length}
+      building={mvps.filter((m) => m.status === 'building').length}
+      selected={mvps.filter((m) => m.status === 'selected').length}
+      avgScore={avgScore}
+    />
+  </div>
+
+  {invalidMvps.length > 0 && (
+    <section class="invalid-section" aria-label="Invalid manifests">
+      <h2 class="invalid-heading">⚠ Invalid Manifests ({invalidMvps.length})</h2>
+      <p class="invalid-hint">These YAML files failed validation and are excluded from the pipeline.</p>
+      <div class="invalid-grid">
+        {invalidMvps.map((inv) => <MvpCardInvalid mvp={inv} />)}
+      </div>
+    </section>
+  )}
+
+  <div class="kanban" role="region" aria-label="MVP kanban board">
+    {LANES.map(({ status, label }) => (
+      <PipelineLane
+        status={status}
+        label={label}
+        mvps={mvps.filter((m) => m.status === status)}
+      />
+    ))}
+  </div>
+</div>
+
+<style>
+  .board { display: flex; flex-direction: column; gap: var(--space-8pt-3); }
+
+  .page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-8pt-3);
+    flex-wrap: wrap;
+  }
+
+  .page-title { font-size: 22px; font-weight: 700; color: var(--bsg-nl-900); margin: 0 0 4px; }
+  .page-sub   { font-size: 13px; color: var(--bsg-nl-600); margin: 0; }
+
+  .invalid-section {
+    background: #fffbeb;
+    border: 1px solid #fbbf24;
+    border-radius: var(--radius);
+    padding: var(--space-8pt-2) var(--space-8pt-3);
+  }
+
+  .invalid-heading { font-size: 14px; font-weight: 700; color: #92400e; margin: 0 0 4px; }
+  .invalid-hint    { font-size: 12px; color: var(--bsg-nl-700); margin: 0 0 var(--space-8pt-2); }
+
+  .invalid-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-8pt-2);
+  }
+
+  .invalid-grid > :global(*) {
+    min-width: 220px;
+    max-width: 320px;
+    flex: 1 1 220px;
+  }
+
+  .kanban {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(220px, 1fr));
+    gap: var(--space-8pt-2);
+    overflow-x: auto;
+  }
+
+  @media (max-width: 1024px) {
+    .kanban { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 600px) {
+    .page-header { flex-direction: column; }
+  }
+</style>

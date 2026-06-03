@@ -1,0 +1,83 @@
+---
+// MvpCardInvalid.astro — warning card for YAML manifests that failed Zod validation (no detail page link)
+interface InvalidManifest {
+  __invalid: true;
+  slug: string;
+  filePath: string;
+  errors: string[];
+}
+
+interface Props {
+  mvp: InvalidManifest;
+}
+
+const { mvp } = Astro.props;
+---
+
+<div class="mvp-card mvp-card--invalid" title={mvp.errors.join('\n')}>
+  <span class="badge badge--warning">⚠ Invalid manifest</span>
+  <h3 class="mvp-name--invalid">{mvp.slug}</h3>
+  <ul class="error-list">
+    {mvp.errors.slice(0, 2).map((e) => <li>{e}</li>)}
+    {mvp.errors.length > 2 && (
+      <li class="error-more">+ {mvp.errors.length - 2} more…</li>
+    )}
+  </ul>
+  <code class="filepath">{mvp.filePath}</code>
+</div>
+
+<style>
+  .mvp-card {
+    border-radius: var(--radius);
+    border: 1px solid var(--surface-border);
+    overflow: hidden;
+    display: block;
+  }
+
+  .mvp-card--invalid {
+    background: #fef3c7;
+    border-left: 3px solid var(--bsg-warning, #D47B0A);
+    padding: var(--space-8pt-2);
+    cursor: default;
+  }
+
+  .badge--warning {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+    display: inline-block;
+    background: #fef3c7;
+    color: #92400e; /* ~6:1 on white, ~4.6:1 on #fef3c7 — WCAG AA */
+    border: 1px solid #d97706;
+  }
+
+  .mvp-name--invalid {
+    font-size: 13px;
+    font-weight: 600;
+    color: #92400e;
+    font-family: ui-monospace, 'Cascadia Code', monospace;
+    margin: 6px 0 4px;
+  }
+
+  .error-list {
+    margin: 0 0 6px;
+    padding-left: 16px;
+    font-size: 11px;
+    color: var(--bsg-nl-700);
+    list-style: disc;
+  }
+
+  .error-more {
+    color: var(--bsg-nl-600);
+    font-style: italic;
+  }
+
+  .filepath {
+    display: block;
+    font-size: 10px;
+    color: var(--bsg-nl-600);
+    word-break: break-all;
+    background: transparent;
+  }
+</style>

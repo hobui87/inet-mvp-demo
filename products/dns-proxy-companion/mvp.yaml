@@ -1,0 +1,19 @@
+id: MVP-007
+name: DNS Proxy Companion
+slug: dns-proxy-companion
+status: building
+created: 2026-05-19
+demo_date: 2026-05-29
+owner: hobv@inet.vn
+problem: |
+  iNET customers cần đổi DNS records hàng loạt nhưng UI hiện tại chậm và không hỗ trợ
+  bulk operations. Mỗi thay đổi phải thực hiện thủ công từng record một, gây mất thời
+  gian và tăng tỷ lệ lỗi cho IT admin.
+target_user: SMB IT admins using iNET DNS hosting
+tech_stack:
+  - next.js@15
+  - postgres
+  - cloudflare-workers
+links:
+  repo: https://gitlab.inet.vn/hobv/dns-proxy-companion
+scoring: []

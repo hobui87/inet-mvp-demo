@@ -1,0 +1,28 @@
+id: MVP-006
+name: Auto-Renew Reminder
+slug: auto-renew-reminder
+status: selected
+created: 2026-05-12
+demo_date: 2026-05-22
+owner: hobv@inet.vn
+problem: |
+  Customer mất domain do quên gia hạn — cần notification chain đa kênh
+  (email, SMS) trước khi domain expire. iNET hiện chỉ gửi 1 email duy nhất
+  30 ngày trước, tỷ lệ domain lapse vẫn cao ở segment SMB.
+target_user: iNET domain hosting customers (SMB segment)
+tech_stack:
+  - typescript
+  - postgres
+  - resend@4
+  - cloudflare-workers
+links:
+  repo: https://gitlab.inet.vn/hobv/auto-renew-reminder
+scoring:
+  - date: 2026-05-22
+    business_potential: 5
+    strategic_fit: 5
+    ux_quality: 4
+    tech_fit: 4
+    weighted: 4.60
+    decision: selected
+    notes: High retention impact, low effort

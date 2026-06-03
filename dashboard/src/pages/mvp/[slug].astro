@@ -1,0 +1,36 @@
+---
+// pages/mvp/[slug].astro — MVP Detail page (View 2): header + manifest panel + scoring chart
+import DashboardLayout from '~/layouts/DashboardLayout.astro';
+import MvpDetailHeader from '~/components/MvpDetailHeader.astro';
+import MvpManifestPanel from '~/components/MvpManifestPanel.astro';
+import ScoreChart from '~/components/ScoreChart.astro';
+import { loadMvps } from '~/lib/load-mvps';
+import type { MvpManifest } from '~/lib/types';
+
+export async function getStaticPaths() {
+  const mvps = await loadMvps();
+  // Only valid manifests (no __invalid flag) get a detail page
+  return mvps.map((mvp) => ({
+    params: { slug: mvp.slug },
+    props: { mvp },
+  }));
+}
+
+interface Props {
+  mvp: MvpManifest;
+}
+
+const { mvp } = Astro.props;
+---
+
+<DashboardLayout title={`${mvp?.name ?? 'MVP Detail'} — iNET Innovation Lab`}>
+  {mvp ? (
+    <article>
+      <MvpDetailHeader mvp={mvp} />
+      <MvpManifestPanel mvp={mvp} />
+      <ScoreChart scoring={mvp.scoring} />
+    </article>
+  ) : (
+    <p style="color: var(--bsg-nl-600); padding: var(--space-8pt-4);">MVP not found.</p>
+  )}
+</DashboardLayout>

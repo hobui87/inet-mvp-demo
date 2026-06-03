@@ -1,0 +1,187 @@
+---
+/**
+ * TechTile.astro — Catalog card for a single tech aggregate entry.
+ * Shows: icon initial, name, version, category, count badge, usedBy slug list, verdict tag.
+ * Verdict colors: keep=green, trial=amber, avoid=red — WCAG AA verified.
+ * Phase 04 ownership.
+ */
+import type { TechAggregate } from '~/lib/types';
+
+interface Props {
+  entry: TechAggregate;
+}
+
+const { entry } = Astro.props;
+
+// Use first 2 chars of name as icon initial
+const iconInitial = entry.name.replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase() || '??';
+
+const verdictLabel: Record<string, string> = {
+  keep:  'Keep',
+  trial: 'Trial',
+  avoid: 'Avoid',
+};
+
+// Derive verdict from the tech aggregate (Phase 02 may extend TechAggregate with verdict)
+// For now we expose it via optional property gracefully
+const verdict = (entry as any).verdict as 'keep' | 'trial' | 'avoid' | undefined;
+
+const categoryLabel: Record<string, string> = {
+  language:  'Language',
+  framework: 'Framework',
+  database:  'Database',
+  service:   'Service',
+  tool:      'Tool',
+};
+---
+
+<article class="tech-tile">
+  <header class="tile-header">
+    <div class="tech-icon" aria-hidden="true">{iconInitial}</div>
+    <div class="tile-meta">
+      <div class="tech-name">
+        {entry.name}{entry.version && <span class="tech-version">@{entry.version}</span>}
+      </div>
+      <div class="tech-cat">{categoryLabel[entry.category] ?? entry.category}</div>
+    </div>
+    <span class="count-badge" aria-label={`${entry.count} MVPs`}>{entry.count}</span>
+  </header>
+
+  {entry.usedBy.length > 0 && (
+    <ul class="slug-list" aria-label="Used by MVPs">
+      {entry.usedBy.map(slug => (
+        <li><a href={`/mvp/${slug}/`} class="slug-pill">{slug}</a></li>
+      ))}
+    </ul>
+  )}
+
+  {verdict && (
+    <span class={`verdict-tag verdict-${verdict}`}>
+      {verdictLabel[verdict] ?? verdict}
+    </span>
+  )}
+</article>
+
+<style>
+  .tech-tile {
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    border-radius: var(--radius);
+    padding: var(--space-8pt-2);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8pt-1);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .tile-header {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-8pt-1);
+  }
+
+  /* 32×32 icon square per mockup spec */
+  .tech-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    background: #dbeafe; /* blue-100 — WCAG safe with #1e3a5f text */
+    color: #1e3a5f;      /* ~10:1 contrast ratio ✓ */
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .tile-meta {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .tech-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--bsg-nl-900); /* 16.1:1 ✓ */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tech-version {
+    font-weight: 400;
+    color: var(--bsg-nl-600); /* 6.35:1 ✓ */
+    font-size: 12px;
+  }
+
+  .tech-cat {
+    font-size: 11px;
+    color: var(--bsg-nl-600); /* 6.35:1 ✓ */
+    margin-top: 2px;
+  }
+
+  .count-badge {
+    flex-shrink: 0;
+    background: var(--bsg-primary);
+    color: #ffffff;           /* on #024799 = 8.88:1 ✓ */
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 10px;
+    padding: 2px 7px;
+    line-height: 1.4;
+  }
+
+  /* Used-by slug list */
+  .slug-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .slug-pill {
+    display: inline-block;
+    padding: 2px 7px;
+    background: var(--bsg-nl-100);
+    border: 1px solid var(--bsg-nl-200);
+    border-radius: 4px;
+    font-size: 11px;
+    color: var(--bsg-nl-700); /* 9.25:1 ✓ */
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+
+  .slug-pill:hover {
+    background: var(--bsg-nl-200);
+    text-decoration: underline;
+  }
+
+  /* Verdict tags — keep/trial/avoid with WCAG AA contrast */
+  .verdict-tag {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: var(--radius-sm);
+    font-size: 11px;
+    font-weight: 600;
+    align-self: flex-start;
+  }
+
+  .verdict-keep {
+    background: #d1fae5; /* green-100 */
+    color: #065f46;      /* green-900 — ~7:1 ✓ */
+  }
+
+  .verdict-trial {
+    background: #fef3c7; /* amber-100 */
+    color: #92400e;      /* amber-900 — ~6:1 ✓ */
+  }
+
+  .verdict-avoid {
+    background: #fee2e2; /* red-100 */
+    color: #7f1d1d;      /* red-900 — ~6.5:1 ✓ */
+  }
+</style>

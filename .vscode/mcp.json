@@ -1,0 +1,8 @@
+{
+  "servers": {
+    "viui": {
+      "url": "https://viui.inet.vn/mcp",
+      "type": "http"
+    }
+  }
+}

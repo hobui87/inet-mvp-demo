@@ -1,0 +1,82 @@
+/* ============================================================
+   ViUI Design Tokens — 3-Tier Architecture
+   Tier 1: Primitive (brand colors, neutral scale)
+   Tier 2: Semantic (component surfaces, badge states)
+   Tier 3: Spacing (8pt grid)
+   WCAG AA: --bsg-primary 8.88:1 | --bsg-accent 5.22:1
+   FORBIDDEN: --bsg-nl-400 (#8FA3B8 = 2.59:1 fails text & icon)
+   ============================================================ */
+
+:root {
+  /* --- Tier 1: Brand Primitives --- */
+  --bsg-primary: #024799;
+  --bsg-accent: #cc0e0e;
+
+  /* Neutral scale (WCAG-safe values only) */
+  --bsg-nl-50:  #f9fafb;
+  --bsg-nl-100: #f3f4f6;
+  --bsg-nl-200: #e5e7eb;
+  --bsg-nl-300: #d1d5db;
+  --bsg-nl-500: #6b7280;
+  --bsg-nl-600: #4b5563;  /* 6.35:1 — safe muted icon */
+  --bsg-nl-700: #374151;  /* 9.25:1 — safe body text */
+  --bsg-nl-900: #111827;  /* 16.1:1 — safe heading */
+
+  /* Semantic status colors (WCAG AA verified) */
+  --bsg-success: #0E9F6E;
+  --bsg-warning: #D47B0A;
+  --bsg-error:   #B91C1C;
+
+  /* --- Tier 1: Spacing (8pt Grid) --- */
+  --space-8pt-1: 8px;   /* xs  */
+  --space-8pt-2: 16px;  /* sm  */
+  --space-8pt-3: 24px;  /* md  */
+  --space-8pt-4: 32px;  /* lg  */
+  --space-8pt-5: 40px;  /* xl  */
+  --space-8pt-6: 48px;  /* 2xl */
+  --space-8pt-8: 64px;  /* 3xl */
+
+  /* --- Tier 2: Button Semantic --- */
+  --btn-bg-primary:   var(--bsg-primary);
+  --btn-fg-primary:   #ffffff;
+  --btn-bg-secondary: var(--bsg-nl-50);
+  --btn-fg-secondary: var(--bsg-nl-700);
+
+  /* --- Tier 2: Pipeline Badge States ---
+     bg/fg pairs all verified WCAG AA on white background */
+  --badge-bg-backlog:  var(--bsg-nl-100);  /* #f3f4f6 */
+  --badge-fg-backlog:  var(--bsg-nl-600);  /* #4b5563 — 6.35:1 ✓ */
+
+  --badge-bg-building: #fef3c7;            /* amber-100 */
+  --badge-fg-building: #92400e;            /* amber-900 — ~6:1 ✓ */
+
+  --badge-bg-selected: #d1fae5;            /* green-100 */
+  --badge-fg-selected: #065f46;            /* green-900 — ~7:1 ✓ */
+
+  --badge-bg-parked:   #fef3c7;            /* same as building */
+  --badge-fg-parked:   #92400e;
+
+  --badge-bg-retired:  #fee2e2;            /* red-100 */
+  --badge-fg-retired:  #7f1d1d;            /* red-900 — ~6.5:1 ✓ */
+
+  /* --- Tier 2: Layout Surface --- */
+  --surface-bg:        var(--bsg-nl-100);
+  --surface-card:      #ffffff;
+  --surface-border:    var(--bsg-nl-200);
+
+  /* --- Tier 2: Topbar --- */
+  --topbar-bg:         var(--bsg-primary);
+  --topbar-fg:         #ffffff;
+  --topbar-nav-hover:  rgba(255, 255, 255, 0.1);
+  --topbar-nav-active: rgba(255, 255, 255, 0.15);
+
+  /* --- Tier 2: Border Radius --- */
+  --radius-sm: 6px;
+  --radius:    10px;
+  --radius-lg: 14px;
+
+  /* --- Tier 2: Shadows --- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow:    0 2px 8px rgba(2, 71, 153, 0.08);
+  --shadow-lg: 0 8px 24px rgba(2, 71, 153, 0.12);
+}

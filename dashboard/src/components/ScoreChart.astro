@@ -1,0 +1,97 @@
+---
+/**
+ * ScoreChart.astro — Chart.js bar chart island for MVP scoring history.
+ * VALIDATION-LOCKED: Must ship as Chart.js island consumed with client:idle directive.
+ * Consumer (Phase 03 MVP detail page): <ScoreChart client:idle scoring={mvp.scoring} />
+ * Bundle ~50KB loads only when browser is idle — zero impact on 3 main pages.
+ * Phase 04 ownership.
+ */
+import type { ScoreEntry } from '~/lib/types';
+
+interface Props {
+  scoring: ScoreEntry[];
+}
+
+const { scoring } = Astro.props;
+
+// Serialize scoring data into canvas data-attribute (avoids inline script injection)
+const chartData = scoring.map(s => ({
+  date: s.date instanceof Date ? s.date.toISOString().slice(0, 10) : String(s.date).slice(0, 10),
+  bp:   s.business_potential,
+  sf:   s.strategic_fit,
+  ux:   s.ux_quality,
+  tf:   s.tech_fit,
+  w:    s.weighted,
+}));
+---
+
+<div class="chart-wrapper">
+  {scoring.length === 0 ? (
+    <p class="no-data">Chưa có dữ liệu scoring.</p>
+  ) : (
+    <canvas
+      class="score-chart-canvas"
+      data-scoring={JSON.stringify(chartData)}
+      aria-label="Biểu đồ điểm đánh giá MVP theo vòng"
+      role="img"
+    ></canvas>
+  )}
+</div>
+
+<script>
+  import { Chart, registerables } from 'chart.js';
+  Chart.register(...registerables);
+
+  document.querySelectorAll<HTMLCanvasElement>('canvas.score-chart-canvas').forEach((canvas) => {
+    const raw: Array<{ date: string; bp: number; sf: number; ux: number; tf: number; w: number }> =
+      JSON.parse(canvas.dataset.scoring || '[]');
+
+    if (raw.length === 0) return;
+
+    new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels: raw.map(r => r.date),
+        datasets: [
+          { label: 'Business',  data: raw.map(r => r.bp), backgroundColor: '#024799' },
+          { label: 'Strategic', data: raw.map(r => r.sf), backgroundColor: '#0e7490' },
+          { label: 'UX',        data: raw.map(r => r.ux), backgroundColor: '#047857' },
+          { label: 'Tech',      data: raw.map(r => r.tf), backgroundColor: '#d97706' },
+          { label: 'Weighted',  data: raw.map(r => r.w),  backgroundColor: '#cc0e0e' },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'bottom' },
+          tooltip: { mode: 'index', intersect: false },
+        },
+        scales: {
+          y: { beginAtZero: true, max: 5, ticks: { stepSize: 1 } },
+          x: { grid: { display: false } },
+        },
+      },
+    });
+  });
+</script>
+
+<style>
+  .chart-wrapper {
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    border-radius: var(--radius);
+    padding: var(--space-8pt-2);
+  }
+
+  .score-chart-canvas {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .no-data {
+    color: var(--bsg-nl-600); /* 6.35:1 ✓ */
+    font-size: 13px;
+    text-align: center;
+    padding: var(--space-8pt-3);
+  }
+</style>

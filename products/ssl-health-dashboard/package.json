@@ -1,0 +1,14 @@
+{
+  "name": "ssl-health-dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch hono-ssl-health-dashboard-api-server.js",
+    "start": "node hono-ssl-health-dashboard-api-server.js"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.7",
+    "hono": "^4.7.10"
+  }
+}

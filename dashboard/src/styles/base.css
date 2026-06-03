@@ -1,0 +1,48 @@
+/* ============================================================
+   Base Reset + Typography Baseline
+   Imports: none (tokens.css imported separately in layout)
+   ============================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", sans-serif;
+  background: var(--surface-bg);
+  color: var(--bsg-nl-900);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+a {
+  color: var(--bsg-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a:focus-visible {
+  outline: 2px solid var(--bsg-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.2;
+  color: var(--bsg-nl-900);
+}

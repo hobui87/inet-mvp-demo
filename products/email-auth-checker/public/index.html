@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>N22 Kiểm Tra Bảo Mật Email — iNET</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23024799' d='M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z'/%3E%3C/svg%3E" />
+  <meta name="description" content="Kiểm tra SPF, DKIM, DMARC của domain — chấm điểm 0-100, hướng dẫn fix tiếng Việt step-by-step." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=20260602" />
+</head>
+<body>
+
+<!-- ONE Series Brand Bar -->
+<div class="one-series-bar" style="background:#024799;color:#fff;font-family:'Inter',system-ui,sans-serif;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+  <div style="max-width:960px;margin:0 auto;padding:0 24px;height:40px;display:flex;align-items:center;justify-content:space-between;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="2" y="2" width="9" height="9" rx="1.5"/><rect x="13" y="2" width="9" height="9" rx="1.5"/><rect x="2" y="13" width="9" height="9" rx="1.5"/><rect x="13" y="13" width="9" height="9" rx="1.5"/></svg>
+      <span style="font-weight:700;letter-spacing:0.8px;font-size:12px;text-transform:uppercase;opacity:0.95;">ONE Series</span>
+      <span style="font-size:10px;opacity:0.45;">by iNET</span>
+    </div>
+    <nav style="display:flex;gap:2px;" aria-label="ONE Series products">
+      <a href="/product/domain-reputation/" style="color:rgba(255,255,255,0.6);text-decoration:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:500;" title="N5 — Domain Reputation Monitor">N5 · Domain</a>
+      <a href="/product/email-auth-checker/" style="color:#fff;text-decoration:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:600;background:rgba(255,255,255,0.18);" title="N22 — Email Auth Checker">N22 · Email</a>
+      <a href="/product/ssl-health-dashboard/" style="color:rgba(255,255,255,0.6);text-decoration:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:500;" title="SSL Certificate Health Dashboard">SSL · Certs</a>
+    </nav>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="container">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-badge">N22</span>
+        <span class="logo-title">Kiểm Tra Bảo Mật Email</span>
+      </div>
+      <p class="logo-sub">SPF · DKIM · DMARC · Score 0–100 · Hướng dẫn fix tiếng Việt</p>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+  <section class="search-section" aria-label="Nhập domain cần kiểm tra">
+
+    <div class="preset-chips" role="group" aria-label="Domain demo nhanh">
+      <span class="chips-label">Demo nhanh:</span>
+      <button type="button" class="chip chip-pass"    data-domain="inet.vn">inet.vn</button>
+      <button type="button" class="chip chip-partial" data-domain="partial.example">partial.example</button>
+      <button type="button" class="chip chip-fail"    data-domain="testfail.example">testfail.example</button>
+    </div>
+
+    <form id="scan-form" class="scan-form" novalidate>
+      <div class="input-group" id="input-group">
+        <label for="domain-input" class="sr-only">Tên miền cần kiểm tra</label>
+        <input
+          id="domain-input"
+          type="text"
+          class="domain-input"
+          placeholder="Nhập tên miền, vd: inet.vn"
+          autocomplete="off"
+          autocapitalize="none"
+          spellcheck="false"
+          aria-describedby="input-error"
+        />
+        <button type="button" class="btn-input-clear" id="btn-input-clear" hidden aria-label="Xóa nội dung">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <button type="submit" class="btn-check" id="btn-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span id="btn-label">Kiểm tra ngay</span>
+        </button>
+      </div>
+      <p id="input-error" class="input-error" role="alert" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <!-- Error banner -->
+  <div id="error-banner" class="error-banner" role="alert" aria-live="assertive" hidden>
+    <span id="error-banner-msg">Không thể kiểm tra, thử lại sau.</span>
+    <button id="btn-retry" class="btn-retry">Thử lại</button>
+  </div>
+
+  <!-- Loading skeleton -->
+  <div id="loading" class="loading-skeleton" hidden aria-live="polite" aria-label="Đang kiểm tra...">
+    <div class="skel-score-row" aria-hidden="true">
+      <div class="skeleton skel-circle"></div>
+      <div class="skel-info">
+        <div class="skeleton skel-badge"></div>
+        <div class="skeleton skel-line-lg"></div>
+        <div class="skeleton skel-line-md"></div>
+      </div>
+    </div>
+    <div class="skeleton skel-action" aria-hidden="true"></div>
+    <div class="skel-cards" aria-hidden="true">
+      <div class="skeleton skel-card"></div>
+      <div class="skeleton skel-card"></div>
+      <div class="skeleton skel-card"></div>
+    </div>
+    <div class="skeleton skel-accordion" aria-hidden="true"></div>
+    <div class="skeleton skel-accordion" aria-hidden="true"></div>
+    <div class="skeleton skel-accordion" aria-hidden="true"></div>
+  </div>
+
+  <!-- Results -->
+  <div id="results" class="results" hidden aria-live="polite">
+
+    <!-- Score circle + grade -->
+    <section class="score-section" aria-label="Điểm bảo mật email">
+      <div class="score-wrapper">
+        <!-- r=80 → circumference = 2*π*80 ≈ 502.65 -->
+        <svg class="score-circle" viewBox="0 0 200 200" aria-hidden="true">
+          <circle class="circle-track"    cx="100" cy="100" r="80" />
+          <circle class="circle-progress" cx="100" cy="100" r="80" id="circle-progress" />
+        </svg>
+        <div class="score-overlay">
+          <span class="score-value" id="score-value">--</span>
+          <span class="score-label">/ 100</span>
+        </div>
+      </div>
+      <div class="grade-info">
+        <span class="grade-badge" id="grade-badge">—</span>
+        <span class="grade-label-text" id="grade-label-text"></span>
+        <p class="scanned-domain" id="scanned-domain"></p>
+        <p class="scan-time" id="scan-time"></p>
+      </div>
+    </section>
+
+    <!-- Summary -->
+    <section id="summary-section" class="summary-section" aria-label="Nhận xét tổng quan">
+      <span class="summary-icon" id="summary-icon" aria-hidden="true"></span>
+      <p class="summary-text" id="summary-text"></p>
+    </section>
+
+    <!-- SPF / DKIM / DMARC cards -->
+    <section class="auth-cards-section" aria-label="Chi tiết SPF DKIM DMARC">
+      <h2 class="section-title">Kết quả kiểm tra</h2>
+      <div class="auth-cards" id="auth-cards" role="list"></div>
+    </section>
+
+    <!-- Score breakdown -->
+    <section class="breakdown-section" aria-label="Phân tích điểm số">
+      <h2 class="section-title">Phân tích điểm</h2>
+      <div class="breakdown-bars">
+        <div class="breakdown-row">
+          <span class="breakdown-label">SPF</span>
+          <div class="breakdown-bar-track"><div class="breakdown-bar-fill spf-bar" id="bar-spf" style="width:0%"></div></div>
+          <span class="breakdown-score" id="score-spf">0/30</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="breakdown-label">DKIM</span>
+          <div class="breakdown-bar-track"><div class="breakdown-bar-fill dkim-bar" id="bar-dkim" style="width:0%"></div></div>
+          <span class="breakdown-score" id="score-dkim">0/35</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="breakdown-label">DMARC</span>
+          <div class="breakdown-bar-track"><div class="breakdown-bar-fill dmarc-bar" id="bar-dmarc" style="width:0%"></div></div>
+          <span class="breakdown-score" id="score-dmarc">0/35</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Fix guide accordion -->
+    <section class="fix-guide-section" aria-label="Hướng dẫn khắc phục">
+      <h2 class="section-title">Hướng dẫn khắc phục</h2>
+      <div id="fix-guide-list"></div>
+    </section>
+
+    <div class="results-footer">
+      <button id="btn-rescan" class="btn-rescan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+          <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/>
+          <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/>
+        </svg>
+        Kiểm tra lại
+      </button>
+      <button id="btn-share" class="btn-share">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>
+        </svg>
+        <span id="btn-share-label">Chia sẻ</span>
+      </button>
+    </div>
+  </div>
+
+</main>
+
+<div id="a11y-announce" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+<script type="module" src="app.js?v=20260602"></script>
+</body>
+</html>

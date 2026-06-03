@@ -1,0 +1,139 @@
+---
+/**
+ * pages/sessions/[date].astro — Session detail page (/sessions/YYYY-MM-DD/).
+ * Renders: date header, mode tag, attendees list, linked MVPs, markdown body.
+ * getStaticPaths generates one route per session date slug.
+ * Zero JS — static Astro page. Phase 04 ownership; Phase 05 swaps stubs.
+ */
+import DashboardLayout from '~/layouts/DashboardLayout.astro';
+import type { Session, MvpManifest } from '~/lib/types';
+import { loadSessions } from '~/lib/load-sessions';
+import { loadMvps } from '~/lib/load-mvps';
+
+export async function getStaticPaths() {
+  const sessions = await loadSessions();
+  return sessions.map(s => {
+    const d = s.date instanceof Date ? s.date : new Date(s.date);
+    const slug = d.toISOString().slice(0, 10);
+    return { params: { date: slug }, props: { session: s } };
+  });
+}
+
+interface Props {
+  session: Session;
+}
+
+const { date } = Astro.params;
+const { session } = Astro.props;
+
+const mvps = await loadMvps();
+
+const modeLabel: Record<string, string> = {
+  'demo-day':        'Demo Day',
+  'progress-review': 'Progress Review',
+};
+
+const modeClass: Record<string, string> = {
+  'demo-day':        'mode-demo',
+  'progress-review': 'mode-review',
+};
+
+const linkedMvps = (session?.mvpSlugs ?? [])
+  .map(slug => mvps.find(m => m.slug === slug))
+  .filter((m): m is MvpManifest => m !== undefined);
+
+const pageTitle = session
+  ? `Session ${date} — iNET Innovation Lab`
+  : `Session ${date}`;
+---
+
+<DashboardLayout title={pageTitle}>
+  {session ? (
+    <article class="session-detail">
+      <header class="detail-header">
+        <div class="date-block">
+          <time datetime={date} class="detail-date">{date}</time>
+          <span class={`mode-tag ${modeClass[session.mode] ?? ''}`}>
+            {modeLabel[session.mode] ?? session.mode}
+          </span>
+        </div>
+
+        {session.attendees.length > 0 && (
+          <div class="attendees-block">
+            <span class="attendees-label">Attendees</span>
+            <ul class="attendees-list">
+              {session.attendees.map(a => <li>{a}</li>)}
+            </ul>
+          </div>
+        )}
+      </header>
+
+      {linkedMvps.length > 0 && (
+        <section class="linked-mvps-section" aria-labelledby="linked-mvps-heading">
+          <h2 id="linked-mvps-heading" class="section-heading">MVPs liên quan</h2>
+          <ul class="mvp-links">
+            {linkedMvps.map(m => (
+              <li>
+                <a href={`/mvp/${m.slug}/`} class="mvp-link-card">
+                  <span class="mvp-link-name">{m.name}</span>
+                  <span class="mvp-link-slug">{m.slug}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {session.body && (
+        <section class="session-body-section" aria-label="Session notes">
+          <div class="prose" set:html={session.body} />
+        </section>
+      )}
+    </article>
+  ) : (
+    <div class="not-found">
+      <h1>Session không tìm thấy</h1>
+      <p>Ngày <code>{date}</code> chưa có session nào được ghi lại.</p>
+      <a href="/sessions/" class="back-link">← Quay lại danh sách sessions</a>
+    </div>
+  )}
+</DashboardLayout>
+
+<style>
+  .session-detail { max-width: 800px; display: flex; flex-direction: column; gap: var(--space-8pt-4); }
+
+  .detail-header {
+    display: flex; align-items: flex-start; gap: var(--space-8pt-3);
+    padding-bottom: var(--space-8pt-3); border-bottom: 1px solid var(--surface-border); flex-wrap: wrap;
+  }
+  .date-block { display: flex; flex-direction: column; gap: var(--space-8pt-1); }
+  .detail-date { font-size: 22px; font-weight: 700; color: var(--bsg-nl-900); letter-spacing: -0.5px; }
+
+  .mode-tag { display: inline-block; padding: 3px 10px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; align-self: flex-start; }
+  .mode-demo   { background: #dbeafe; color: #1e40af; }
+  .mode-review { background: #f3e8ff; color: #6b21a8; }
+
+  .attendees-block { display: flex; flex-direction: column; gap: 4px; }
+  .attendees-label { font-size: 11px; font-weight: 600; color: var(--bsg-nl-600); text-transform: uppercase; letter-spacing: 0.5px; }
+  .attendees-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 4px; }
+  .attendees-list li { padding: 2px 8px; background: var(--bsg-nl-100); border: 1px solid var(--bsg-nl-200); border-radius: 4px; font-size: 12px; color: var(--bsg-nl-700); }
+
+  .section-heading { font-size: 14px; font-weight: 700; color: var(--bsg-nl-700); margin: 0 0 var(--space-8pt-2); }
+  .mvp-links { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-8pt-1); }
+  .mvp-link-card { display: flex; align-items: center; gap: var(--space-8pt-2); padding: var(--space-8pt-1) var(--space-8pt-2); background: var(--surface-card); border: 1px solid var(--surface-border); border-radius: var(--radius-sm); text-decoration: none; transition: box-shadow 0.15s; }
+  .mvp-link-card:hover { box-shadow: var(--shadow); border-color: var(--bsg-nl-300); }
+  .mvp-link-name { font-size: 13px; font-weight: 600; color: var(--bsg-primary); }
+  .mvp-link-slug { font-size: 11px; color: var(--bsg-nl-600); font-family: monospace; }
+
+  .prose { font-size: 14px; line-height: 1.7; color: var(--bsg-nl-700); }
+  .prose :global(h1), .prose :global(h2), .prose :global(h3) { color: var(--bsg-nl-900); margin: var(--space-8pt-3) 0 var(--space-8pt-1); }
+  .prose :global(a) { color: var(--bsg-primary); }
+  .prose :global(code) { background: var(--bsg-nl-200); padding: 1px 5px; border-radius: 4px; font-size: 13px; color: var(--bsg-nl-700); }
+  .prose :global(pre) { background: var(--bsg-nl-900); color: #f9fafb; padding: var(--space-8pt-2); border-radius: var(--radius-sm); overflow-x: auto; font-size: 13px; }
+
+  .not-found { text-align: center; padding: var(--space-8pt-6) var(--space-8pt-3); color: var(--bsg-nl-700); }
+  .not-found h1 { color: var(--bsg-nl-900); margin-bottom: var(--space-8pt-2); }
+  .not-found code { background: var(--bsg-nl-200); padding: 2px 6px; border-radius: 4px; }
+  .back-link { display: inline-block; margin-top: var(--space-8pt-3); color: var(--bsg-primary); text-decoration: none; font-weight: 500; }
+  .back-link:hover { text-decoration: underline; }
+</style>

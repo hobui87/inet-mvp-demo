@@ -1,0 +1,114 @@
+---
+/**
+ * pages/sessions/index.astro — Friday Sessions calendar list page (/sessions/).
+ * Groups sessions by month descending. Zero JS — static Astro page.
+ * Phase 04 ownership; Phase 05 swaps stubs to real imports.
+ */
+import DashboardLayout from '~/layouts/DashboardLayout.astro';
+import SessionsCalendar from '~/components/SessionsCalendar.astro';
+import { loadSessions } from '~/lib/load-sessions';
+import { loadMvps } from '~/lib/load-mvps';
+
+const sessions = await loadSessions();
+const mvps = await loadMvps();
+
+const totalSessions = sessions.length;
+
+// Next upcoming session (date > today, earliest first)
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+const upcoming = sessions
+  .filter(s => {
+    const d = s.date instanceof Date ? s.date : new Date(s.date);
+    return d > today;
+  })
+  .sort((a, b) => {
+    const da = a.date instanceof Date ? a.date.getTime() : new Date(a.date).getTime();
+    const db = b.date instanceof Date ? b.date.getTime() : new Date(b.date).getTime();
+    return da - db;
+  });
+
+const nextSession = upcoming[0];
+const nextLabel = nextSession
+  ? (nextSession.date instanceof Date ? nextSession.date : new Date(nextSession.date))
+      .toISOString().slice(0, 10)
+  : '—';
+---
+
+<DashboardLayout title="Friday Sessions — iNET Innovation Lab">
+  <div class="page-header">
+    <div class="header-text">
+      <h1 class="page-title">Friday Sessions</h1>
+      <p class="page-sub">Lịch demo + progress review · <code>evaluation/sessions/*.md</code></p>
+    </div>
+    <div class="stats-bar" aria-label="Session statistics">
+      <div class="stat">
+        <span class="stat-val">{totalSessions}</span>
+        <span class="stat-lbl">Sessions YTD</span>
+      </div>
+      <div class="stat">
+        <span class="stat-val">{nextLabel}</span>
+        <span class="stat-lbl">Next</span>
+      </div>
+    </div>
+  </div>
+
+  <SessionsCalendar sessions={sessions} mvps={mvps} />
+</DashboardLayout>
+
+<style>
+  .page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-8pt-3);
+    margin-bottom: var(--space-8pt-4);
+    flex-wrap: wrap;
+  }
+
+  .page-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--bsg-nl-900); /* 16.1:1 ✓ */
+    margin: 0 0 4px;
+  }
+
+  .page-sub {
+    font-size: 13px;
+    color: var(--bsg-nl-600); /* 6.35:1 ✓ */
+    margin: 0;
+  }
+
+  .page-sub code {
+    background: var(--bsg-nl-200);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--bsg-nl-700);
+  }
+
+  .stats-bar {
+    display: flex;
+    gap: var(--space-8pt-3);
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .stat-val {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--bsg-primary); /* #024799 on white = 8.88:1 ✓ */
+    line-height: 1.2;
+  }
+
+  .stat-lbl {
+    font-size: 11px;
+    color: var(--bsg-nl-600); /* 6.35:1 ✓ */
+    white-space: nowrap;
+  }
+</style>

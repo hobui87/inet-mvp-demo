@@ -1,0 +1,15 @@
+{
+  "name": "domain-reputation-monitor",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --env-file .env --watch hono-domain-reputation-api-server.js",
+    "start": "node --env-file .env hono-domain-reputation-api-server.js"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.7",
+    "better-sqlite3": "^12.10.0",
+    "hono": "^4.7.10"
+  }
+}

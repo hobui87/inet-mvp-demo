@@ -1,0 +1,13 @@
+---
+// pages/index.astro — MVP Pipeline Kanban view (View 1)
+import DashboardLayout from '~/layouts/DashboardLayout.astro';
+import PipelineBoard from '~/components/PipelineBoard.astro';
+import { loadMvps, loadInvalidMvps } from '~/lib/load-mvps';
+
+const mvps = await loadMvps();
+const invalidMvps = await loadInvalidMvps();
+---
+
+<DashboardLayout title="MVP Pipeline — iNET Innovation Lab">
+  <PipelineBoard mvps={mvps} invalidMvps={invalidMvps} />
+</DashboardLayout>
