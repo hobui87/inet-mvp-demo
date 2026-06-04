@@ -1,22 +1,23 @@
 #!/usr/bin/env bash
 # ============================================================
-#  One-time server setup: huongthao.io.vn
-#  Ubuntu 22.04 | Node 22 | pnpm | PM2 | Nginx | Certbot
+#  One-time server setup: inet-mvp-demo (huongthao.io.vn)
+#  Ubuntu 22.04 | Node 22 | pnpm | PM2 | Cloudflare Tunnel
+#  (Không cần Nginx/SSL — Cloudflare xử lý HTTPS)
 #
 #  Chạy từ local:
-#    ssh hobv-vps 'bash -s' < scripts/server-initial-setup-friday-products-ubuntu-node22-pm2-nginx.sh
+#    Get-Content scripts/server-initial-setup-inet-mvp-demo-ubuntu-node22-pm2-cloudflare-tunnel.sh | ssh hobv-vps 'bash -s'
 #
 #  Sau khi chạy xong, thêm GitHub Secrets tại:
-#    https://github.com/hobui87/friday-products/settings/secrets/actions
+#    https://github.com/hobui87/inet-mvp-demo/settings/secrets/actions
 # ============================================================
 
 set -euo pipefail
 
-DEPLOY_DIR="$HOME/friday-products"
-GITHUB_REPO="hobui87/friday-products"
+DEPLOY_DIR="$HOME/inet-mvp-demo"
+GITHUB_REPO="hobui87/inet-mvp-demo"
 APP_DOMAIN="huongthao.io.vn"
 HUB_PORT=9030
-OLD_DEPLOY_DIR="$HOME/huongthao-demo"
+OLD_DEPLOY_DIR="$HOME/inet-mvp-demo"
 
 echo ""
 echo "======================================================"
@@ -51,11 +52,11 @@ if [ ! -f "$DEPLOY_KEY" ]; then
 fi
 
 # SSH config để dùng deploy key khi kết nối GitHub
-GITHUB_HOST_ALIAS="github.com-friday-products"
+GITHUB_HOST_ALIAS="github.com-inet-mvp-demo"
 if ! grep -q "$GITHUB_HOST_ALIAS" "$HOME/.ssh/config" 2>/dev/null; then
   cat >> "$HOME/.ssh/config" << EOF
 
-# Deploy key cho friday-products
+# Deploy key cho inet-mvp-demo
 Host ${GITHUB_HOST_ALIAS}
     HostName github.com
     User git
@@ -129,9 +130,9 @@ echo ""
 echo "=== [7/9] PM2 start ==="
 cd "$DEPLOY_DIR"
 if pm2 list | grep -q "hub"; then
-  pm2 reload pm2-ecosystem-config-friday-products-all-services.cjs --update-env
+  pm2 reload pm2-ecosystem-config-inet-mvp-demo-all-services.cjs --update-env
 else
-  pm2 start pm2-ecosystem-config-friday-products-all-services.cjs
+  pm2 start pm2-ecosystem-config-inet-mvp-demo-all-services.cjs
 fi
 pm2 save
 
@@ -139,54 +140,11 @@ echo ""
 echo "  PM2 startup command (chạy lệnh dưới với sudo):"
 pm2 startup | grep "sudo"
 
-# ── 8. Nginx config ───────────────────────────────────────
-echo ""
-echo "=== [8/9] Nginx config ==="
-NGINX_CONF="/etc/nginx/sites-available/${APP_DOMAIN}.conf"
-sudo tee "$NGINX_CONF" > /dev/null << NGINX_EOF
-server {
-    listen 80;
-    listen [::]:80;
-    server_name ${APP_DOMAIN} www.${APP_DOMAIN};
-
-    location / {
-        proxy_pass         http://127.0.0.1:${HUB_PORT};
-        proxy_http_version 1.1;
-        proxy_set_header   Upgrade \$http_upgrade;
-        proxy_set_header   Connection 'upgrade';
-        proxy_set_header   Host \$host;
-        proxy_set_header   X-Real-IP \$remote_addr;
-        proxy_set_header   X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header   X-Forwarded-Proto \$scheme;
-        proxy_cache_bypass \$http_upgrade;
-        proxy_read_timeout 60s;
-    }
-}
-NGINX_EOF
-
-if [ ! -L "/etc/nginx/sites-enabled/${APP_DOMAIN}.conf" ]; then
-  sudo ln -s "$NGINX_CONF" "/etc/nginx/sites-enabled/${APP_DOMAIN}.conf"
-fi
-sudo nginx -t && sudo systemctl reload nginx
-echo "  ✓ Nginx configured → http://${APP_DOMAIN}"
-
-# ── 9. SSL với Certbot ────────────────────────────────────
-echo ""
-echo "=== [9/9] SSL (Certbot) ==="
-if command -v certbot &>/dev/null; then
-  sudo certbot --nginx -d "$APP_DOMAIN" -d "www.${APP_DOMAIN}" --non-interactive --agree-tos -m admin@inet.vn
-  echo "  ✓ SSL certificate installed"
-else
-  echo "  Certbot chưa cài. Chạy:"
-  echo "    sudo apt install certbot python3-certbot-nginx -y"
-  echo "    sudo certbot --nginx -d ${APP_DOMAIN} -d www.${APP_DOMAIN}"
-fi
-
 # ── Summary ───────────────────────────────────────────────
 echo ""
 echo "======================================================"
 echo "  Setup hoàn tất!"
-echo "  Site: https://${APP_DOMAIN}"
+echo "  Cloudflare tunnel → localhost:${HUB_PORT} → ${APP_DOMAIN}"
 echo ""
 echo "  Thêm GitHub Secrets tại:"
 echo "  https://github.com/${GITHUB_REPO}/settings/secrets/actions"

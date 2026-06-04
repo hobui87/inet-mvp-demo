@@ -20,7 +20,7 @@ jobs:
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
 
-            cd ~/friday-products
+            cd ~/inet-mvp-demo
 
             # Pull latest code (uses GitHub deploy key configured during setup)
             git pull origin main
@@ -34,4 +34,4 @@ jobs:
             done
 
             # Zero-downtime reload all PM2 processes
-            pm2 reload pm2-ecosystem-config-friday-products-all-services.cjs --update-env
+            pm2 reload pm2-ecosystem-config-inet-mvp-demo-all-services.cjs --update-env
