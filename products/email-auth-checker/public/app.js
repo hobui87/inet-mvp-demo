@@ -8,10 +8,14 @@ const GRADE_COLORS = {
 };
 
 const STATUS_ICONS = {
-  ok:    '✅',
-  warn:  '⚠️',
-  error: '❌',
+  ok:      '✅',
+  warn:    '⚠️',
+  warning: '⚠️',
+  error:   '❌',
 };
+
+// backend emits 'warning'; CSS uses 'warn' — normalize for class names
+const normStatus = s => (s === 'warning' ? 'warn' : s);
 
 const SUMMARY_ICON_SVG = {
   A: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
@@ -166,7 +170,7 @@ function renderAuthCards(data) {
 
   cards.forEach(card => {
     const el = document.createElement('div');
-    el.className = `auth-card status-${card.status}`;
+    el.className = `auth-card status-${normStatus(card.status)}`;
     el.setAttribute('role', 'listitem');
     el.innerHTML = `
       <div class="auth-card-header">
@@ -200,7 +204,7 @@ function renderFixGuide(fixGuide) {
 
   fixGuide.forEach((section, idx) => {
     const item = document.createElement('div');
-    item.className = `accordion-item status-${section.status}`;
+    item.className = `accordion-item status-${normStatus(section.status)}`;
 
     const triggerId = `accordion-trigger-${idx}`;
     const bodyId    = `accordion-body-${idx}`;

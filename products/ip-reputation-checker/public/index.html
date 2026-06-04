@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>N-next · IP Reputation Checker</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23024799' d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E" />
+  <meta name="description" content="Kiểm tra IP qua 11 RBL lists · PTR record · ASN/ISP lookup · Score 0–100" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=20260604" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0b1220; color: #e6edf7; font-family: 'Inter', system-ui, sans-serif; }
+    .container { max-width: 960px; margin: 0 auto; padding: 24px; }
+  </style>
+</head>
+<body>
+
+<!-- ONE Series Brand Bar -->
+<div class="one-series-bar" style="background:#024799;color:#fff;font-family:'Inter',system-ui,sans-serif;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+  <div style="max-width:960px;margin:0 auto;padding:0 24px;height:40px;display:flex;align-items:center;justify-content:space-between;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="2" y="2" width="9" height="9" rx="1.5"/><rect x="13" y="2" width="9" height="9" rx="1.5"/><rect x="2" y="13" width="9" height="9" rx="1.5"/><rect x="13" y="13" width="9" height="9" rx="1.5"/></svg>
+      <span style="font-weight:700;letter-spacing:0.8px;font-size:12px;text-transform:uppercase;opacity:0.95;">ONE Series</span>
+      <span style="font-size:10px;opacity:0.45;">by iNET</span>
+    </div>
+    <nav style="display:flex;gap:2px;" aria-label="ONE Series products">
+      <a href="/product/domain-reputation/"  style="color:rgba(255,255,255,0.6);text-decoration:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:500;" title="N5 — Domain Reputation Monitor">N5 · Domain</a>
+      <a href="/product/email-auth-checker/" style="color:rgba(255,255,255,0.6);text-decoration:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:500;" title="N22 — Email Auth Checker">N22 · Email</a>
+      <a href="/product/ssl-health-dashboard/" style="color:rgba(255,255,255,0.6);text-decoration:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:500;" title="SSL Certificate Health Dashboard">SSL · Certs</a>
+      <a href="/product/ip-reputation/" style="color:#fff;text-decoration:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:600;background:rgba(255,255,255,0.18);" title="N-next — IP Reputation Checker">IP · Reputation</a>
+    </nav>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="container">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-badge">N-next</span>
+        <span class="logo-title">IP Reputation Checker</span>
+      </div>
+      <p class="logo-sub">Kiểm tra IP qua 11 RBL lists · PTR record · ASN/ISP lookup · Score 0–100</p>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- Tab nav -->
+  <nav class="tab-nav" role="tablist" aria-label="Chế độ xem">
+    <button class="tab-btn tab-active" role="tab" aria-selected="true"  aria-controls="panel-single"  id="tab-single"  data-tab="single">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Quét đơn
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-history" id="tab-history" data-tab="history">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.1"/></svg>
+      Lịch sử
+    </button>
+  </nav>
+
+  <!-- ── Panel: Quét đơn ─────────────────────────────────── -->
+  <div id="panel-single" role="tabpanel" aria-labelledby="tab-single">
+
+    <section class="search-section" aria-label="Nhập IP cần kiểm tra">
+      <div class="preset-chips" role="group" aria-label="IP demo nhanh">
+        <span class="chips-label">Demo nhanh:</span>
+        <button type="button" class="chip chip-clean"    data-ip="103.28.248.1">103.28.248.1 <span style="opacity:0.6;font-size:10px;">(iNET)</span></button>
+        <button type="button" class="chip chip-moderate" data-ip="192.0.2.10">192.0.2.10 <span style="opacity:0.6;font-size:10px;">(Moderate)</span></button>
+        <button type="button" class="chip chip-risk"     data-ip="198.51.100.99">198.51.100.99 <span style="opacity:0.6;font-size:10px;">(High Risk)</span></button>
+      </div>
+
+      <form id="scan-form" class="scan-form" novalidate>
+        <div class="input-row">
+          <div class="input-group" id="input-group">
+            <label for="ip-input" class="sr-only">Địa chỉ IP hoặc tên miền</label>
+            <input
+              id="ip-input"
+              type="text"
+              class="domain-input"
+              placeholder="Nhập IP hoặc tên miền (vd: inet.vn)"
+              autocomplete="off"
+              autocapitalize="none"
+              spellcheck="false"
+              aria-describedby="input-error"
+            />
+            <button type="button" class="btn-input-clear" id="btn-input-clear" hidden aria-label="Xóa nội dung">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            <button type="submit" class="btn-scan" id="btn-scan">
+              <svg class="icon-scan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <span id="btn-label">Scan</span>
+            </button>
+          </div>
+          <button type="button" class="btn-myip" id="btn-myip" title="Tự động phát hiện IP công khai của bạn" aria-label="Điền IP của tôi">
+            <span class="btn-myip-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </span>
+            <span id="myip-label">IP của tôi</span>
+          </button>
+        </div>
+        <p id="input-error" class="input-error" role="alert" aria-live="polite"></p>
+        <p id="resolved-badge" class="resolved-badge" hidden></p>
+      </form>
+    </section>
+
+    <div id="error-banner" class="error-banner" role="alert" aria-live="assertive" hidden>
+      <span id="error-banner-msg">Không thể quét, thử lại sau.</span>
+      <button id="btn-retry" class="btn-retry">Thử lại</button>
+    </div>
+
+    <div id="results" class="results" hidden aria-live="polite">
+
+      <section class="score-section" aria-label="Kết quả điểm reputation">
+        <div class="score-wrapper">
+          <svg class="score-circle" viewBox="0 0 200 200" aria-hidden="true">
+            <circle class="circle-track" cx="100" cy="100" r="90" />
+            <circle class="circle-progress" id="circle-progress" cx="100" cy="100" r="90" />
+          </svg>
+          <div class="score-overlay">
+            <span class="score-value" id="score-value">--</span>
+            <span class="score-label">/ 100</span>
+          </div>
+        </div>
+        <div class="grade-info">
+          <span class="grade-badge" id="grade-badge">—</span>
+          <p class="scanned-domain" id="scanned-ip"></p>
+          <p class="scan-time" id="scan-time"></p>
+        </div>
+      </section>
+
+      <section id="action-section" class="action-section" aria-label="Khuyến nghị">
+        <span class="action-icon" id="action-icon" aria-hidden="true"></span>
+        <p class="action-text" id="action-text"></p>
+      </section>
+
+      <!-- PTR + ASN cards -->
+      <div class="info-cards">
+        <div class="info-card" id="ptr-card">
+          <div class="info-card-title">PTR Record (rDNS)</div>
+          <div class="info-card-value" id="ptr-value">—</div>
+          <div class="info-card-hint" id="ptr-hint"></div>
+        </div>
+        <div class="info-card" id="asn-card">
+          <div class="info-card-title">ASN / ISP</div>
+          <div class="info-card-value" id="asn-value">—</div>
+          <div class="info-card-hint" id="asn-hint"></div>
+        </div>
+      </div>
+
+      <section class="grid-section" aria-label="Chi tiết 11 RBL Lists">
+        <h2 class="grid-title">Chi tiết 11 RBL Lists</h2>
+        <div class="bl-grid" id="bl-grid" role="list"></div>
+      </section>
+
+      <div class="results-footer">
+        <button id="btn-rescan" class="btn-rescan">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/>
+            <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/>
+          </svg>
+          Quét lại
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading skeleton -->
+    <div id="loading" class="loading-skeleton" hidden aria-live="polite" aria-label="Đang quét...">
+      <section class="score-section skel-score" aria-hidden="true">
+        <div class="score-wrapper"><div class="skeleton skel-circle"></div></div>
+        <div class="skel-grade-info">
+          <div class="skeleton skel-badge-ph"></div>
+          <div class="skeleton skel-line-lg"></div>
+          <div class="skeleton skel-line-md"></div>
+        </div>
+      </section>
+      <div class="skeleton skel-action" aria-hidden="true"></div>
+      <div class="info-cards" aria-hidden="true">
+        <div class="skeleton" style="height:80px;border-radius:10px;"></div>
+        <div class="skeleton" style="height:80px;border-radius:10px;"></div>
+      </div>
+      <div style="margin:16px 0 14px"><div class="skeleton skel-line-sm"></div></div>
+      <div class="bl-grid" aria-hidden="true">
+        <div class="skeleton skel-bl-card"></div>
+        <div class="skeleton skel-bl-card"></div>
+        <div class="skeleton skel-bl-card"></div>
+        <div class="skeleton skel-bl-card"></div>
+        <div class="skeleton skel-bl-card"></div>
+        <div class="skeleton skel-bl-card"></div>
+        <div class="skeleton skel-bl-card"></div>
+        <div class="skeleton skel-bl-card"></div>
+        <div class="skeleton skel-bl-card"></div>
+        <div class="skeleton skel-bl-card"></div>
+        <div class="skeleton skel-bl-card"></div>
+      </div>
+    </div>
+
+  </div><!-- /panel-single -->
+
+  <!-- ── Panel: Lịch sử ─────────────────────────────────── -->
+  <div id="panel-history" role="tabpanel" aria-labelledby="tab-history" hidden>
+
+    <section class="history-section">
+      <div class="history-header">
+        <h2 class="grid-title">Lịch sử quét gần nhất</h2>
+        <button id="btn-refresh-history" class="btn-ghost" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" width="14" height="14">
+            <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.1"/>
+          </svg>
+          Làm mới
+        </button>
+      </div>
+      <div id="history-list" class="history-list" aria-live="polite">
+        <p class="empty-state">Chưa có lịch sử. Hãy quét một IP trước.</p>
+      </div>
+    </section>
+
+  </div><!-- /panel-history -->
+
+</main>
+
+<div id="a11y-announce" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+<script type="module" src="app.js?v=20260604"></script>
+</body>
+</html>

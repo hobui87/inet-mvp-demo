@@ -16,6 +16,7 @@ const PRODUCT_PORTS = {
   'domain-reputation': 9041,
   'email-auth-checker': 9042,
   'ssl-health-dashboard': 9043,
+  'ip-reputation': 9044,
 };
 
 const app = new Hono();
@@ -45,6 +46,7 @@ app.all('/product/:name/*', async (c) => {
       9041: 'dev:domain-rep',
       9042: 'dev:email-auth',
       9043: 'dev:ssl-health',
+      9044: 'dev:ip-rep',
     };
     const cmd = cmdMap[port] || 'dev:hub';
     return c.text(`Product server ":${port}" unreachable — chạy "pnpm ${cmd}" để start product server`, 502);

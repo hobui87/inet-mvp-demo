@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iNET Friday Demo Gallery</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #024799;
+      --navy-dark: #013370;
+      --navy-light: #e8f0fb;
+      --red: #cc0e0e;
+      --gray-100: #f5f7fa;
+      --gray-200: #e8ecf0;
+      --gray-500: #6b7280;
+      --gray-700: #374151;
+      --gray-900: #111827;
+      --radius: 10px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--gray-100);
+      color: var(--gray-900);
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      background: var(--navy);
+      color: #fff;
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 2px 8px rgba(2,71,153,0.3);
+    }
+    header .logo {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    header .logo span { color: #7fb3f5; }
+    header .subtitle {
+      font-size: 13px;
+      opacity: 0.75;
+      margin-top: 2px;
+    }
+    header .spacer { flex: 1; }
+    header .meta {
+      font-size: 12px;
+      opacity: 0.6;
+      text-align: right;
+    }
+
+    /* Main layout */
+    main { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+
+    /* Plan group */
+    .plan-group { margin-bottom: 40px; }
+    .plan-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--navy-light);
+    }
+    .plan-header h2 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--navy);
+    }
+    .plan-header .plan-date {
+      font-size: 12px;
+      color: var(--gray-500);
+    }
+    .plan-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+      background: var(--navy-light);
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Demo grid */
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    /* Demo card */
+    .demo-card {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: box-shadow 0.15s, transform 0.15s;
+      display: flex;
+      flex-direction: column;
+    }
+    .demo-card:hover {
+      box-shadow: 0 4px 20px rgba(2,71,153,0.12);
+      transform: translateY(-2px);
+    }
+
+    .card-top {
+      height: 6px;
+      background: var(--navy);
+    }
+    .card-top.approved  { background: #16a34a; }
+    .card-top.pending   { background: var(--navy); }
+    .card-top.reviewing { background: #d97706; }
+
+    .card-body { padding: 16px 18px; flex: 1; }
+    .card-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--gray-900);
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+    .card-meta {
+      font-size: 12px;
+      color: var(--gray-500);
+      margin-bottom: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .tag {
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 11px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+    .status-badge.pending  { background: #eff6ff; color: var(--navy); }
+    .status-badge.approved { background: #f0fdf4; color: #15803d; }
+    .status-badge.reviewing { background: #fff7ed; color: #c2410c; }
+    .status-badge::before { content: "●"; font-size: 8px; }
+
+    .card-footer {
+      padding: 12px 18px;
+      border-top: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-date { font-size: 11px; color: var(--gray-500); }
+    .btn-open {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--navy);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-open:hover { background: var(--navy-dark); }
+    .btn-open svg { width: 12px; height: 12px; }
+
+    /* Search bar */
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .search-wrap {
+      flex: 1;
+      position: relative;
+    }
+    .search-wrap svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 15px;
+      height: 15px;
+      color: var(--gray-500);
+      pointer-events: none;
+    }
+    #search-input {
+      width: 100%;
+      padding: 9px 36px 9px 36px;
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      font-size: 13px;
+      background: #fff;
+      color: var(--gray-900);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    #search-input:focus {
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px rgba(2,71,153,0.1);
+    }
+    #search-clear {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 2px;
+      color: var(--gray-500);
+      display: none;
+      line-height: 1;
+      font-size: 16px;
+    }
+    #search-clear:hover { color: var(--gray-900); }
+    #search-count {
+      font-size: 12px;
+      color: var(--gray-500);
+      white-space: nowrap;
+    }
+
+    /* Empty state */
+    .empty {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--gray-500);
+      font-size: 14px;
+    }
+    #no-results {
+      display: none;
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--gray-500);
+      font-size: 14px;
+    }
+
+    /* Stats bar */
+    .stats-bar {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 28px;
+      padding: 14px 20px;
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+    }
+    .stat { display: flex; flex-direction: column; gap: 2px; }
+    .stat-value { font-size: 22px; font-weight: 700; color: var(--navy); }
+    .stat-label { font-size: 11px; color: var(--gray-500); }
+
+    /* Live Products section */
+    .live-section {
+      margin-bottom: 40px;
+      padding: 20px;
+      background: #f0fdf4;
+      border: 1.5px solid #86efac;
+      border-radius: var(--radius);
+    }
+    .live-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .live-header h2 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #15803d;
+    }
+    .live-dot {
+      width: 10px;
+      height: 10px;
+      background: #16a34a;
+      border-radius: 50%;
+      animation: pulse-dot 2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.6; transform: scale(1.25); }
+    }
+    .live-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 2px 8px;
+      background: #16a34a;
+      color: #fff;
+      border-radius: 20px;
+    }
+    .live-card { border-color: #86efac; }
+    .btn-live { background: #16a34a; }
+    .btn-live:hover { background: #15803d; }
+
+    /* Markdown preview panel */
+    .md-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 1000;
+      backdrop-filter: blur(2px);
+    }
+    .md-overlay.open { display: block; }
+    .md-panel {
+      position: fixed;
+      top: 0; right: 0; bottom: 0;
+      width: min(780px, 95vw);
+      background: #fff;
+      box-shadow: -4px 0 32px rgba(0,0,0,0.18);
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.25s cubic-bezier(.4,0,.2,1);
+      z-index: 1001;
+    }
+    .md-overlay.open .md-panel { transform: translateX(0); }
+    .md-panel-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--gray-200);
+      background: var(--gray-100);
+      flex-shrink: 0;
+    }
+    .md-panel-title {
+      flex: 1;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--navy);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .md-panel-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+      color: var(--gray-500);
+      line-height: 1;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .md-panel-close:hover { background: var(--gray-200); color: var(--gray-900); }
+    .md-panel-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px 32px;
+      scroll-behavior: smooth;
+    }
+    .md-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 120px;
+      color: var(--gray-500);
+      font-size: 13px;
+      gap: 8px;
+    }
+    .md-spinner {
+      width: 18px; height: 18px;
+      border: 2px solid var(--gray-200);
+      border-top-color: var(--navy);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Rendered markdown typography */
+    .md-content { font-size: 14px; line-height: 1.7; color: var(--gray-900); }
+    .md-content h1 { font-size: 22px; font-weight: 700; margin: 0 0 16px; color: var(--navy); border-bottom: 2px solid var(--navy-light); padding-bottom: 10px; }
+    .md-content h2 { font-size: 17px; font-weight: 700; margin: 28px 0 10px; color: var(--navy-dark); }
+    .md-content h3 { font-size: 14px; font-weight: 700; margin: 20px 0 8px; color: var(--gray-700); }
+    .md-content h4 { font-size: 13px; font-weight: 700; margin: 16px 0 6px; }
+    .md-content p { margin: 0 0 12px; }
+    .md-content ul, .md-content ol { padding-left: 22px; margin: 0 0 12px; }
+    .md-content li { margin-bottom: 4px; }
+    .md-content code { background: var(--gray-100); border: 1px solid var(--gray-200); border-radius: 4px; padding: 1px 5px; font-size: 12px; font-family: 'SFMono-Regular', Consolas, monospace; }
+    .md-content pre { background: #1e1e2e; border-radius: 8px; padding: 16px; overflow-x: auto; margin: 0 0 14px; }
+    .md-content pre code { background: none; border: none; padding: 0; color: #cdd6f4; font-size: 12.5px; }
+    .md-content blockquote { border-left: 3px solid var(--navy); margin: 0 0 12px; padding: 8px 16px; background: var(--navy-light); border-radius: 0 6px 6px 0; color: var(--gray-700); }
+    .md-content table { width: 100%; border-collapse: collapse; margin: 0 0 14px; font-size: 13px; }
+    .md-content th { background: var(--navy-light); color: var(--navy); padding: 8px 12px; text-align: left; font-weight: 600; }
+    .md-content td { padding: 7px 12px; border-bottom: 1px solid var(--gray-200); }
+    .md-content tr:last-child td { border-bottom: none; }
+    .md-content a { color: var(--navy); }
+    .md-content hr { border: none; border-top: 1px solid var(--gray-200); margin: 20px 0; }
+    .md-content strong { font-weight: 700; }
+    .md-content em { font-style: italic; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">iNET <span>Friday</span> Demo Gallery</div>
+    <div class="subtitle">Quản lý các demo HTML trong quá trình lên kế hoạch</div>
+  </div>
+  <div class="spacer"></div>
+  <div class="meta">
+    friday.binhnguyen.io.vn<br>
+    Cập nhật: 2026-06-04 (incident report + 3 sự cố xử lý)
+  </div>
+</header>
+
+<main>
+
+  <!-- Search -->
+  <div class="search-bar">
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="search-input" type="text" placeholder="Tìm kiếm demo, plan, tag..." autocomplete="off" />
+      <button id="search-clear" title="Xóa tìm kiếm">✕</button>
+    </div>
+    <span id="search-count"></span>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-bar">
+    <div class="stat"><span class="stat-value">30</span><span class="stat-label">Tổng demo</span></div>
+    <div class="stat"><span class="stat-value">10</span><span class="stat-label">Plans đang có demo</span></div>
+    <div class="stat"><span class="stat-value">2</span><span class="stat-label">Đã duyệt</span></div>
+    <div class="stat"><span class="stat-value">3</span><span class="stat-label">Đang review</span></div>
+    <div class="stat"><span class="stat-value">24</span><span class="stat-label">Chờ review</span></div>
+  </div>
+
+  <!-- Live Products -->
+  <div class="live-section">
+    <div class="live-header">
+      <span class="live-dot"></span>
+      <h2>Sản phẩm đang chạy</h2>
+      <span class="live-badge">LIVE</span>
+      <span style="font-size:10px;font-weight:700;letter-spacing:0.8px;padding:2px 8px;background:#024799;color:#fff;border-radius:20px;text-transform:uppercase;">ONE Series</span>
+    </div>
+    <div class="demo-grid">
+
+      <div class="demo-card live-card">
+        <div class="card-top approved"></div>
+        <div class="card-body">
+          <div class="card-name">N5 — Domain Reputation Monitor</div>
+          <div class="card-meta">
+            <span class="tag" style="background:#e8f0fb;border-color:#024799;color:#024799;font-weight:600;">ONE Series</span>
+            <span class="tag">Hono · Node.js</span>
+            <span class="tag">DNSBL · 15+ lists</span>
+            <span class="tag">port 9041</span>
+          </div>
+          <span class="status-badge approved">Demo Ready ✓</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">friday.binhnguyen.io.vn</span>
+          <a class="btn-open btn-live" href="/product/domain-reputation/" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Mở sản phẩm
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card live-card">
+        <div class="card-top reviewing"></div>
+        <div class="card-body">
+          <div class="card-name">N22 — Email Authentication Health Checker</div>
+          <div class="card-meta">
+            <span class="tag" style="background:#e8f0fb;border-color:#024799;color:#024799;font-weight:600;">ONE Series</span>
+            <span class="tag">Hono · Node.js</span>
+            <span class="tag">SPF · DKIM · DMARC</span>
+            <span class="tag">port 9042</span>
+          </div>
+          <span class="status-badge reviewing">Verified & Reviewed ✓</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-06-04</span>
+          <a class="btn-open btn-live" href="/product/email-auth-checker/" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Mở sản phẩm
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card live-card">
+        <div class="card-top reviewing"></div>
+        <div class="card-body">
+          <div class="card-name">SSL Certificate Health Dashboard</div>
+          <div class="card-meta">
+            <span class="tag" style="background:#e8f0fb;border-color:#024799;color:#024799;font-weight:600;">ONE Series</span>
+            <span class="tag">Hono · Node.js</span>
+            <span class="tag">SSL · node:https</span>
+            <span class="tag">port 9043</span>
+          </div>
+          <span class="status-badge reviewing">Verified & Reviewed ✓</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-06-04</span>
+          <a class="btn-open btn-live" href="/product/ssl-health-dashboard/" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Mở sản phẩm
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card live-card">
+        <div class="card-top reviewing"></div>
+        <div class="card-body">
+          <div class="card-name">N-next — IP Reputation & Reverse DNS Checker</div>
+          <div class="card-meta">
+            <span class="tag" style="background:#e8f0fb;border-color:#024799;color:#024799;font-weight:600;">ONE Series</span>
+            <span class="tag">Hono · Node.js</span>
+            <span class="tag">11 RBL lists · PTR · ASN</span>
+            <span class="tag">port 9044</span>
+          </div>
+          <span class="status-badge reviewing">Verified & Reviewed ✓</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-06-04</span>
+          <a class="btn-open btn-live" href="/product/ip-reputation/" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Mở sản phẩm
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Incident Report: Node Version Mismatch & Cloudflare Linger Fix (260604) -->
+  <div class="plan-group">
+    <div class="plan-header">
+      <h2>🔧 Incident Report — Node Mismatch & Cloudflare Error 1033</h2>
+      <span class="plan-date">2026-06-04</span>
+      <span class="plan-badge">incident</span>
+    </div>
+    <div class="demo-grid">
+
+      <div class="demo-card">
+        <div class="card-top approved"></div>
+        <div class="card-body">
+          <div class="card-name">🔧 Báo cáo Sự cố — Node v20/v22 Mismatch + Cloudflare Error 1033</div>
+          <div class="card-meta">
+            <span class="tag">reports/</span>
+            <span class="tag">Volta · better-sqlite3</span>
+            <span class="tag">systemd Linger</span>
+            <span class="tag">3 issues resolved</span>
+          </div>
+          <span class="status-badge approved">Resolved ✓</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-06-04</span>
+          <a class="btn-open" href="reports/incident-260604-1058-node-version-mismatch-and-cloudflare-linger-fix.html" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Báo Cáo
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Research: Vietnam Market & Next ONE Series MVPs (260603) -->
+  <div class="plan-group">
+    <div class="plan-header">
+      <h2>Research — Thị Trường VN & ONE Series Tiếp Theo</h2>
+      <span class="plan-date">2026-06-03</span>
+      <span class="plan-badge">research</span>
+    </div>
+    <div class="demo-grid">
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">🗺️ Research Summary — Cơ Hội MVP Tiếp Theo cho iNET ONE Series</div>
+          <div class="card-meta">
+            <span class="tag">reports/</span>
+            <span class="tag">tổng hợp</span>
+            <span class="tag">top-5 MVPs</span>
+            <span class="tag">thị trường VN</span>
+          </div>
+          <span class="status-badge pending">Sẵn sàng dùng</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-06-03</span>
+          <a class="btn-open" href="reports/research-summary-260603-0906-vietnam-market-inet-mvp-next-series.md" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Tổng Hợp
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">🔍 Researcher 1 — iNET Service Gaps & 15 MVP Opportunities</div>
+          <div class="card-meta">
+            <span class="tag">reports/</span>
+            <span class="tag">service gaps</span>
+            <span class="tag">15 ideas</span>
+            <span class="tag">ONE Series pattern</span>
+          </div>
+          <span class="status-badge pending">Sẵn sàng dùng</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-06-03</span>
+          <a class="btn-open" href="reports/researcher-1-260603-0906-inet-service-gaps-mvp-opportunities.md" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Báo Cáo
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">⚔️ Researcher 2 — Phân Tích Cạnh Tranh & Khoảng Trống Thị Trường Hosting VN</div>
+          <div class="card-meta">
+            <span class="tag">reports/</span>
+            <span class="tag">competitive</span>
+            <span class="tag">Azdigi vs iNET</span>
+            <span class="tag">blue ocean</span>
+          </div>
+          <span class="status-badge pending">Sẵn sàng dùng</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-06-03</span>
+          <a class="btn-open" href="reports/researcher-2-260603-0908-competitive-gap-analysis-vietnam.md" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Báo Cáo
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">📈 Researcher 3 — Xu Hướng Thị Trường Số VN & Emerging Needs 2025-2026</div>
+          <div class="card-meta">
+            <span class="tag">reports/</span>
+            <span class="tag">trends</span>
+            <span class="tag">PDPL 2026</span>
+            <span class="tag">cloud growth</span>
+            <span class="tag">AIOps</span>
+          </div>
+          <span class="status-badge pending">Sẵn sàng dùng</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-06-03</span>
+          <a class="btn-open" href="reports/researcher-3-260603-0908-vietnam-digital-trends-emerging-needs.md" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Báo Cáo
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Plan: IP Reputation & Reverse DNS Checker (260603-1404) -->
+  <div class="plan-group">
+    <div class="plan-header">
+      <h2>N-next — IP Reputation & Reverse DNS Checker</h2>
+      <span class="plan-date">2026-06-03</span>
+      <span class="plan-badge">product</span>
+    </div>
+    <div class="demo-grid">
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">📋 Plan Overview — IP Reputation Checker (5 phases)</div>
+          <div class="card-meta">
+            <span class="tag">ONE Series</span>
+            <span class="tag">port 9044</span>
+            <span class="tag">Hono · SQLite</span>
+          </div>
+          <span class="status-badge pending">Pending</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-06-03</span>
+          <a class="btn-open" href="260603-1404-ip-reputation-checker/plan.md" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Plan
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">⚙️ Phase 01 — Scaffold Product Dir & Đăng Ký Hub Port 9044</div>
+          <div class="card-meta">
+            <span class="tag">scaffold</span>
+            <span class="tag">hub integration</span>
+            <span class="tag">~30 phút</span>
+          </div>
+          <span class="status-badge pending">Pending</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-06-03</span>
+          <a class="btn-open" href="260603-1404-ip-reputation-checker/phase-01-scaffold-product-dir-and-register-hub-port-9044.md" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Phase
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">🔍 Phase 02 — Backend IP RBL DNS Checker, PTR Record & ASN Lookup</div>
+          <div class="card-meta">
+            <span class="tag">11 RBL zones</span>
+            <span class="tag">reversed-IP DNS</span>
+            <span class="tag">PTR · ip-api.com</span>
+            <span class="tag">~3-4 giờ</span>
+          </div>
+          <span class="status-badge pending">Pending</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-06-03</span>
+          <a class="btn-open" href="260603-1404-ip-reputation-checker/phase-02-backend-ip-rbl-dns-checker-ptr-record-and-asn-lookup.md" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Phase
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">📊 Phase 03 — Scoring Engine, SQLite History & Hono API Server Port 9044</div>
+          <div class="card-meta">
+            <span class="tag">score 0-100</span>
+            <span class="tag">PTR penalty -10</span>
+            <span class="tag">SQLite</span>
+            <span class="tag">~2 giờ</span>
+          </div>
+          <span class="status-badge pending">Pending</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-06-03</span>
+          <a class="btn-open" href="260603-1404-ip-reputation-checker/phase-03-scoring-engine-sqlite-history-and-hono-api-server-port-9044.md" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Phase
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">🎨 Phase 04 — Frontend UI: Score Circle, PTR Card, ASN Card, RBL Grid & History</div>
+          <div class="card-meta">
+            <span class="tag">dark theme</span>
+            <span class="tag">ONE Series nav</span>
+            <span class="tag">PTR card · ASN card</span>
+            <span class="tag">~3 giờ</span>
+          </div>
+          <span class="status-badge pending">Pending</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-06-03</span>
+          <a class="btn-open" href="260603-1404-ip-reputation-checker/phase-04-frontend-ui-score-circle-ptr-card-asn-card-rbl-grid-and-history.md" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Phase
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">✅ Phase 05 — Demo Overrides, ONE Series Nav Update & Plans Index Gallery Card</div>
+          <div class="card-meta">
+            <span class="tag">demo polish</span>
+            <span class="tag">3 IP scenarios</span>
+            <span class="tag">smoke test</span>
+            <span class="tag">~1 giờ</span>
+          </div>
+          <span class="status-badge pending">Pending</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-06-03</span>
+          <a class="btn-open" href="260603-1404-ip-reputation-checker/phase-05-demo-overrides-one-series-nav-update-and-plans-index-gallery-card.md" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Phase
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Standalone Visuals (no active plan) -->
+  <div class="plan-group">
+    <div class="plan-header">
+      <h2>Visuals — Phân tích & Tài liệu kỹ thuật</h2>
+      <span class="plan-date">2026-06-02</span>
+      <span class="plan-badge">reference</span>
+    </div>
+    <div class="demo-grid">
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">📝 Demo 60 Phút — iNET MVP Tools Showcase (Narrative & Flow Script)</div>
+          <div class="card-meta">
+            <span class="tag">reports/</span>
+            <span class="tag">demo-script</span>
+            <span class="tag">N5 + N22 + SSL</span>
+            <span class="tag">ViUI Design System</span>
+            <span class="tag">checklist</span>
+          </div>
+          <span class="status-badge pending">Sẵn sàng dùng</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-06-02 13:17</span>
+          <a class="btn-open" href="reports/researcher-1-260602-1317-demo-60-minute-narrative-and-flow.md" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Script
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">🎯 Slide Deck — Demo 60 Phút với Team Tech (Presentation HTML)</div>
+          <div class="card-meta">
+            <span class="tag">visuals/</span>
+            <span class="tag">slides</span>
+            <span class="tag">N5 + N22 + SSL + ViUI</span>
+            <span class="tag">keyboard-nav</span>
+            <span class="tag">timer</span>
+          </div>
+          <span class="status-badge pending">Sẵn sàng dùng</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-06-02</span>
+          <a class="btn-open" href="visuals/260602-1316-friday-demo-60min-slide-deck-tech-team-presentation.html" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Mở Slides
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">⚔️ Battle Cards — Tech Debate Cheatsheet Interactive (Q&A Prep)</div>
+          <div class="card-meta">
+            <span class="tag">visuals/</span>
+            <span class="tag">battle-cards</span>
+            <span class="tag">tech-debate</span>
+            <span class="tag">Q&A</span>
+            <span class="tag">interactive</span>
+          </div>
+          <span class="status-badge pending">Sẵn sàng dùng</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-06-02</span>
+          <a class="btn-open" href="visuals/260602-1316-friday-demo-tech-debate-battle-cards-interactive-cheatsheet.html" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Mở Cheatsheet
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">Cấu trúc hoạt động: Cloud Server · Tên Miền · Email Server Riêng</div>
+          <div class="card-meta">
+            <span class="tag">visuals/</span>
+            <span class="tag">architecture</span>
+            <span class="tag">interactive</span>
+          </div>
+          <span class="status-badge pending">Chờ review</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-05-19</span>
+          <a class="btn-open" href="visuals/service-architecture-cloud-server-domain-email-interactive-diagram.html" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Demo
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">MVP Ideas Catalog — Mirror DNS Proxy iNET DNA (15 ý tưởng + 5 parking)</div>
+          <div class="card-meta">
+            <span class="tag">visuals/</span>
+            <span class="tag">mvp-catalog</span>
+            <span class="tag">interactive</span>
+            <span class="tag">mockup</span>
+          </div>
+          <span class="status-badge pending">Chờ review</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-05-22</span>
+          <a class="btn-open" href="visuals/mvp-ideas-catalog-mirroring-dns-proxy-inet-interactive-review-demo.html" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Demo
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">Competitor Research — iNET vs Top 15 Domain/CDN/Hosting Providers (VN + Quốc tế)</div>
+          <div class="card-meta">
+            <span class="tag">visuals/</span>
+            <span class="tag">research</span>
+            <span class="tag">competitive-intelligence</span>
+            <span class="tag">9-tabs</span>
+          </div>
+          <span class="status-badge pending">Chờ review</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-05-22 11:04</span>
+          <a class="btn-open" href="visuals/competitor-research-inet-vs-top-15-domain-cdn-hosting-providers-interactive-analysis-demo.html" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Demo
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top approved"></div>
+        <div class="card-body">
+          <div class="card-name">🥇 Friday Demo Product Pick — N5 Domain Reputation Monitor (Decision Brief)</div>
+          <div class="card-meta">
+            <span class="tag">visuals/</span>
+            <span class="tag">decision-brief</span>
+            <span class="tag">friday-29-05</span>
+            <span class="tag">9-tabs</span>
+          </div>
+          <span class="status-badge approved">Đã chọn</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-05-22 11:04</span>
+          <a class="btn-open" href="visuals/friday-demo-product-pick-recommendation-n5-domain-reputation-monitor-interactive-review.html" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Demo
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">MVP Dashboard Mockup — Astro Markdown-Driven (Pipeline + Sessions + Scoring + Tech Catalog)</div>
+          <div class="card-meta">
+            <span class="tag">visuals/</span>
+            <span class="tag">mvp-dashboard</span>
+            <span class="tag">astro</span>
+            <span class="tag">wireframe</span>
+            <span class="tag">4-views</span>
+          </div>
+          <span class="status-badge pending">Chờ review</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-05-22 13:17</span>
+          <a class="btn-open" href="visuals/260522-1317-mvp-dashboard-astro-markdown-driven-mockup.html" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Demo
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Plan: 260508 - iNET Innovation Lab -->
+  <div class="plan-group">
+    <div class="plan-header">
+      <h2>iNET Innovation Lab — MVP Incubator Framework</h2>
+      <span class="plan-date">2026-05-08</span>
+      <span class="plan-badge">pending</span>
+    </div>
+    <div class="demo-grid">
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">Innovation Lab — Demo Overview</div>
+          <div class="card-meta">
+            <span class="tag">reports/</span>
+            <span class="tag">overview</span>
+          </div>
+          <span class="status-badge pending">Chờ review</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-05-08 23:34</span>
+          <a class="btn-open" href="260508-0811-inet-innovation-lab/reports/demo-260508-2334-inet-innovation-lab.html" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Demo
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Plan: 260522 - MVP Dashboard Astro -->
+  <div class="plan-group">
+    <div class="plan-header">
+      <h2>MVP Dashboard — Astro Markdown-Driven (4 Views)</h2>
+      <span class="plan-date">2026-05-22</span>
+      <span class="plan-badge">pending</span>
+    </div>
+    <div class="demo-grid">
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">MVP Dashboard — Pipeline Kanban + Sessions + Scoring + Tech Catalog (Built)</div>
+          <div class="card-meta">
+            <span class="tag">dashboard/dist/</span>
+            <span class="tag">astro</span>
+            <span class="tag">static</span>
+            <span class="tag">3-mvps</span>
+          </div>
+          <span class="status-badge pending">Chờ review</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-05-22 16:01</span>
+          <a class="btn-open" href="../dashboard/dist/index.html" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Demo
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Plan: 260522 - N5 Domain Reputation Monitor -->
+  <div class="plan-group">
+    <div class="plan-header">
+      <h2>N5 Domain Reputation Monitor — Friday Demo 29/05</h2>
+      <span class="plan-date">2026-05-22</span>
+      <span class="plan-badge">pending</span>
+    </div>
+    <div class="demo-grid">
+
+      <div class="demo-card">
+        <div class="card-top reviewing"></div>
+        <div class="card-body">
+          <div class="card-name">Phase 1 — Bootstrap Hono Backend + DNS Blocklist Engine</div>
+          <div class="card-meta">
+            <span class="tag">products/domain-reputation/</span>
+            <span class="tag">hono</span>
+            <span class="tag">node.js</span>
+            <span class="tag">dnsbl</span>
+          </div>
+          <span class="status-badge reviewing">Backend Done ✓</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-05-25 09:56</span>
+          <a class="btn-open" href="260522-1659-n5-domain-reputation-monitor/phase-01-bootstrap-hono-backend-dns-blocklist-engine.md" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Plan
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top reviewing"></div>
+        <div class="card-body">
+          <div class="card-name">Phase 2 — Frontend UI: Score Circle + Blocklist Grid</div>
+          <div class="card-meta">
+            <span class="tag">vanilla-js</span>
+            <span class="tag">svg-animation</span>
+            <span class="tag">dark-theme</span>
+            <span class="tag">responsive</span>
+          </div>
+          <span class="status-badge reviewing">Frontend Done ✓</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-05-25 11:45</span>
+          <a class="btn-open" href="260522-1659-n5-domain-reputation-monitor/phase-02-frontend-ui-score-circle-blocklist-grid.md" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Plan
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top approved"></div>
+        <div class="card-body">
+          <div class="card-name">Phase 3 — Demo Prep, Polish &amp; Tunnel Integration</div>
+          <div class="card-meta">
+            <span class="tag">demo-prep</span>
+            <span class="tag">shareable-url</span>
+            <span class="tag">skeleton-loading</span>
+            <span class="tag">chips</span>
+            <span class="tag">friday-29-05</span>
+          </div>
+          <span class="status-badge approved">Demo Ready ✓</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-05-26 08:24</span>
+          <a class="btn-open" href="260522-1659-n5-domain-reputation-monitor/phase-03-demo-prep-polish-tunnel-integration.md" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Plan
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Plan: 260511 - Design Token Layer -->
+  <div class="plan-group">
+    <div class="plan-header">
+      <h2>Token-First Design System Setup — iNET Innovation Lab</h2>
+      <span class="plan-date">2026-05-11</span>
+      <span class="plan-badge">pending</span>
+    </div>
+    <div class="demo-grid">
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">Architecture Sketch — Design System Friday Demo Feasibility</div>
+          <div class="card-meta">
+            <span class="tag">visuals/</span>
+            <span class="tag">architecture</span>
+          </div>
+          <span class="status-badge pending">Chờ review</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-05-11</span>
+          <a class="btn-open" href="260511-0817-inet-design-token-layer/visuals/architecture-sketch-design-system-friday-demo-feasibility.html" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Demo
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">iNET Reseller Hub MVP — Unified Client Service Renewal Revenue Dashboard</div>
+          <div class="card-meta">
+            <span class="tag">visuals/</span>
+            <span class="tag">dashboard</span>
+            <span class="tag">mvp</span>
+          </div>
+          <span class="status-badge pending">Chờ review</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-05-11</span>
+          <a class="btn-open" href="260511-0817-inet-design-token-layer/visuals/inet-reseller-hub-mvp-demo-unified-client-service-renewal-revenue-dashboard.html" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Demo
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Plan: 260528-1417 - N22 Email Authentication Health Checker -->
+  <div class="plan-group">
+    <div class="plan-group-header">
+      <span class="plan-name">N22 — Email Authentication Health Checker</span>
+      <span class="plan-badge">pending</span>
+    </div>
+    <div class="demo-grid">
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">Phase 01 — Project Setup & Hono Server Skeleton</div>
+          <div class="card-meta">
+            <span class="tag">products/email-auth-checker/</span>
+            <span class="tag">Hono · ESM</span>
+            <span class="tag">port 9042</span>
+          </div>
+          <span class="status-badge pending">Chờ review</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-05-28</span>
+          <a class="btn-open" href="260528-1417-n22-email-authentication-health-checker/phase-01-project-setup-and-hono-server-skeleton.md" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Plan
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">Phase 02 — Backend SPF/DKIM/DMARC DNS Record Checkers</div>
+          <div class="card-meta">
+            <span class="tag">DNS TXT lookup</span>
+            <span class="tag">SPF · DKIM · DMARC</span>
+            <span class="tag">1.5 dev-days</span>
+          </div>
+          <span class="status-badge pending">Chờ review</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-05-28</span>
+          <a class="btn-open" href="260528-1417-n22-email-authentication-health-checker/phase-02-backend-spf-dkim-dmarc-dns-record-checkers.md" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Plan
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">Phase 03 — Scoring Engine & Vietnamese Remediation Guide</div>
+          <div class="card-meta">
+            <span class="tag">Score 0-100</span>
+            <span class="tag">Grade A-F</span>
+            <span class="tag">Fix guide tiếng Việt</span>
+          </div>
+          <span class="status-badge pending">Chờ review</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-05-28</span>
+          <a class="btn-open" href="260528-1417-n22-email-authentication-health-checker/phase-03-scoring-engine-and-vietnamese-remediation-guide-generator.md" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Plan
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">Phase 04 — Frontend UI với Score Circle & Fix Guide Accordion</div>
+          <div class="card-meta">
+            <span class="tag">Vanilla JS</span>
+            <span class="tag">Score circle</span>
+            <span class="tag">Mobile responsive</span>
+          </div>
+          <span class="status-badge pending">Chờ review</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-05-28</span>
+          <a class="btn-open" href="260528-1417-n22-email-authentication-health-checker/phase-04-frontend-ui-with-score-circle-and-fix-guide-accordion.md" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Plan
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">Phase 05 — Real Domain Testing & Friday Demo Preparation</div>
+          <div class="card-meta">
+            <span class="tag">Demo override</span>
+            <span class="tag">inet.vn · gmail.com</span>
+            <span class="tag">Demo script</span>
+          </div>
+          <span class="status-badge pending">Chờ review</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-05-28</span>
+          <a class="btn-open" href="260528-1417-n22-email-authentication-health-checker/phase-05-real-domain-testing-and-friday-demo-preparation.md" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Plan
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="no-results">Không tìm thấy kết quả nào phù hợp.</div>
+
+</main>
+
+<!-- Markdown Preview Panel -->
+<div class="md-overlay" id="md-overlay">
+  <div class="md-panel" id="md-panel">
+    <div class="md-panel-header">
+      <span class="md-panel-title" id="md-panel-title"></span>
+      <button class="md-panel-close" id="md-panel-close" title="Đóng (Esc)">✕</button>
+    </div>
+    <div class="md-panel-body" id="md-panel-body"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
+<script>
+  (function () {
+    const input = document.getElementById('search-input');
+    const clearBtn = document.getElementById('search-clear');
+    const countEl = document.getElementById('search-count');
+    const totalCards = document.querySelectorAll('.demo-card').length;
+    let debounceTimer;
+
+    function normalize(str) {
+      return str.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    }
+
+    function filter(query) {
+      const q = normalize(query.trim());
+      let visible = 0;
+
+      // Filter each card
+      document.querySelectorAll('.demo-card').forEach(card => {
+        const name = card.querySelector('.card-name')?.textContent || '';
+        const tags = Array.from(card.querySelectorAll('.tag')).map(t => t.textContent).join(' ');
+        const status = card.querySelector('.status-badge')?.textContent || '';
+        const haystack = normalize(name + ' ' + tags + ' ' + status);
+        const match = !q || haystack.includes(q);
+        card.style.display = match ? '' : 'none';
+        if (match) visible++;
+      });
+
+      // Hide empty plan groups and live section
+      document.querySelectorAll('.plan-group').forEach(group => {
+        const anyVisible = Array.from(group.querySelectorAll('.demo-card')).some(c => c.style.display !== 'none');
+        group.style.display = anyVisible ? '' : 'none';
+      });
+      const liveSection = document.querySelector('.live-section');
+      if (liveSection) {
+        const anyVisible = Array.from(liveSection.querySelectorAll('.demo-card')).some(c => c.style.display !== 'none');
+        liveSection.style.display = anyVisible ? '' : 'none';
+      }
+
+      // No-results message
+      document.getElementById('no-results').style.display = (visible === 0 && q) ? 'block' : 'none';
+
+      // Count
+      countEl.textContent = q ? `${visible} / ${totalCards} kết quả` : '';
+
+      // Clear button
+      clearBtn.style.display = q ? 'inline' : 'none';
+    }
+
+    input.addEventListener('input', function () {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => filter(this.value), 250);
+    });
+
+    clearBtn.addEventListener('click', function () {
+      input.value = '';
+      filter('');
+      input.focus();
+    });
+
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { input.value = ''; filter(''); }
+    });
+  })();
+</script>
+
+<script>
+  // Markdown preview panel
+  (function () {
+    const overlay = document.getElementById('md-overlay');
+    const panel   = document.getElementById('md-panel');
+    const titleEl = document.getElementById('md-panel-title');
+    const body    = document.getElementById('md-panel-body');
+    const closeBtn = document.getElementById('md-panel-close');
+
+    function openPanel(href, label) {
+      titleEl.textContent = label || href.split('/').pop();
+      body.innerHTML = '<div class="md-loading"><span class="md-spinner"></span> Đang tải...</div>';
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+
+      fetch(href)
+        .then(r => {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.text();
+        })
+        .then(md => {
+          const html = (typeof marked !== 'undefined')
+            ? marked.parse(md)
+            : '<pre style="white-space:pre-wrap">' + md.replace(/</g, '&lt;') + '</pre>';
+          body.innerHTML = '<div class="md-content">' + html + '</div>';
+          body.scrollTop = 0;
+        })
+        .catch(err => {
+          body.innerHTML = '<div class="md-loading" style="color:#c00">Không tải được file: ' + err.message + '</div>';
+        });
+    }
+
+    function closePanel() {
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // Intercept .md link clicks
+    document.addEventListener('click', function (e) {
+      const link = e.target.closest('a.btn-open');
+      if (!link) return;
+      const href = link.getAttribute('href');
+      if (!href || !href.endsWith('.md')) return;
+      e.preventDefault();
+      const label = link.closest('.demo-card')?.querySelector('.card-name')?.textContent || href.split('/').pop();
+      openPanel(href, label);
+    });
+
+    closeBtn.addEventListener('click', closePanel);
+    overlay.addEventListener('click', function (e) {
+      if (!panel.contains(e.target)) closePanel();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && overlay.classList.contains('open')) closePanel();
+    });
+  })();
+</script>
+
+</body>
+</html>

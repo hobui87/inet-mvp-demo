@@ -2,6 +2,8 @@
 
 # dependencies
 /node_modules
+products/ip-reputation-checker/node_modules/
+products/ip-reputation-checker/data/
 /.pnp
 .pnp.*
 .yarn/*
@@ -60,6 +62,7 @@ repomix-output.xml
 .serena/cache
 plans/**/*
 !plans/templates/*
+!plans/index.html
 screenshots/*
 docs/screenshots/*
 logs.txt

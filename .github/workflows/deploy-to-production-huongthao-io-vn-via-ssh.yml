@@ -1,0 +1,37 @@
+name: Deploy to huongthao.io.vn
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to production via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            set -e
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
+
+            cd ~/friday-products
+
+            # Pull latest code (uses GitHub deploy key configured during setup)
+            git pull origin main
+
+            # Install root dependencies
+            pnpm install --no-frozen-lockfile
+
+            # Install each product's dependencies (rebuilds native modules like better-sqlite3 if updated)
+            for dir in products/*/; do
+              [ -f "${dir}package.json" ] && (cd "${dir}" && pnpm install --no-frozen-lockfile)
+            done
+
+            # Zero-downtime reload all PM2 processes
+            pm2 reload pm2-ecosystem-config-friday-products-all-services.cjs --update-env

@@ -4,8 +4,11 @@
 #
 # Starts:
 #   [1] Domain Reputation Monitor  — Hono, port 9041
-#   [2] Friday Demo Hub server     — Hono, port 9030  (plans/ gallery + /product/* proxy)
-#   [3] Cloudflared tunnel         — exposes port 9030 via https://friday.binhnguyen.io.vn
+#   [2] Email Auth Checker         — Hono, port 9042
+#   [3] SSL Health Dashboard       — Hono, port 9043
+#   [4] IP Reputation Checker      — Hono, port 9044
+#   [5] Friday Demo Hub server     — Hono, port 9030  (plans/ gallery + /product/* proxy)
+#   [6] Cloudflared tunnel         — exposes port 9030 via https://friday.binhnguyen.io.vn
 
 # Script lives in scripts/ — project root is one level up
 $projectRoot  = Split-Path $PSScriptRoot -Parent
@@ -20,14 +23,16 @@ Write-Host ""
 
 $jobs = @()
 
-# Kiem tra port 9030 da duoc dung chua
-$portInUse = netstat -ano | Select-String ":$port " | Select-String "LISTENING"
-if ($portInUse) {
-    Write-Host "[WARN] Port $port dang duoc dung. Tat process cu..." -ForegroundColor Yellow
-    $oldPid = ($portInUse -split '\s+')[-1]
-    Stop-Process -Id $oldPid -Force -ErrorAction SilentlyContinue
-    Start-Sleep -Seconds 1
+# Cleanup tat ca ports cu truoc khi start (tranh zombie processes khi re-run)
+foreach ($cleanPort in @(9030, 9041, 9042, 9043, 9044)) {
+    $old = netstat -ano 2>$null | Select-String ":$cleanPort " | Select-String "LISTENING"
+    if ($old) {
+        $oldPid = ($old -split '\s+')[-1]
+        Stop-Process -Id $oldPid -Force -ErrorAction SilentlyContinue
+        Write-Host "[CLEAN] Cleared port $cleanPort (pid $oldPid)" -ForegroundColor Gray
+    }
 }
+Start-Sleep -Milliseconds 500
 
 # Helper: wait until port is listening or timeout
 function Wait-Port {
@@ -41,8 +46,8 @@ function Wait-Port {
     return $false
 }
 
-# [1/5] Domain Reputation Monitor — Hono API + frontend (port 9041)
-Write-Host "[1/5] Khoi dong Domain Reputation Monitor (port 9041)..." -ForegroundColor Yellow
+# [1/6] Domain Reputation Monitor — Hono API + frontend (port 9041)
+Write-Host "[1/6] Khoi dong Domain Reputation Monitor (port 9041)..." -ForegroundColor Yellow
 $repJob = Start-Job -ScriptBlock {
     param($dir)
     Set-Location $dir
@@ -59,8 +64,8 @@ if (-not (Wait-Port -Port 9041 -TimeoutSec 15)) {
 Write-Host "        Domain Reputation Monitor OK (port 9041)" -ForegroundColor Green
 $jobs += $repJob
 
-# [2/5] Email Auth Checker — Hono API + frontend (port 9042)
-Write-Host "[2/5] Khoi dong Email Auth Checker (port 9042)..." -ForegroundColor Yellow
+# [2/6] Email Auth Checker — Hono API + frontend (port 9042)
+Write-Host "[2/6] Khoi dong Email Auth Checker (port 9042)..." -ForegroundColor Yellow
 $emailJob = Start-Job -ScriptBlock {
     param($dir)
     Set-Location $dir
@@ -76,8 +81,8 @@ if (-not (Wait-Port -Port 9042 -TimeoutSec 15)) {
     $jobs += $emailJob
 }
 
-# [3/5] SSL Health Dashboard — Hono API + frontend (port 9043)
-Write-Host "[3/5] Khoi dong SSL Health Dashboard (port 9043)..." -ForegroundColor Yellow
+# [3/6] SSL Health Dashboard — Hono API + frontend (port 9043)
+Write-Host "[3/6] Khoi dong SSL Health Dashboard (port 9043)..." -ForegroundColor Yellow
 $sslJob = Start-Job -ScriptBlock {
     param($dir)
     Set-Location $dir
@@ -93,8 +98,25 @@ if (-not (Wait-Port -Port 9043 -TimeoutSec 15)) {
     $jobs += $sslJob
 }
 
-# [4/5] Hub server — serve plans/ + reverse-proxy /product/* (port 9030)
-Write-Host "[4/5] Khoi dong Hub server (port $port)..." -ForegroundColor Yellow
+# [4/6] IP Reputation Checker — Hono API + frontend (port 9044)
+Write-Host "[4/6] Khoi dong IP Reputation Checker (port 9044)..." -ForegroundColor Yellow
+$ipRepJob = Start-Job -ScriptBlock {
+    param($dir)
+    Set-Location $dir
+    pnpm dev:ip-rep 2>&1
+} -ArgumentList $projectRoot
+
+if (-not (Wait-Port -Port 9044 -TimeoutSec 15)) {
+    Write-Host "[WARN] IP Reputation Checker khong start duoc (port 9044 timeout) — tiep tuc khong co san pham nay." -ForegroundColor Yellow
+    Receive-Job $ipRepJob | Select-Object -Last 5 | ForEach-Object { Write-Host "       $_" -ForegroundColor DarkYellow }
+    Stop-Job $ipRepJob; Remove-Job $ipRepJob
+} else {
+    Write-Host "        IP Reputation Checker OK (port 9044)" -ForegroundColor Green
+    $jobs += $ipRepJob
+}
+
+# [5/6] Hub server — serve plans/ + reverse-proxy /product/* (port 9030)
+Write-Host "[5/6] Khoi dong Hub server (port $port)..." -ForegroundColor Yellow
 $hubJob = Start-Job -ScriptBlock {
     param($dir)
     Set-Location $dir
@@ -113,15 +135,16 @@ $jobs += $hubJob
 
 Write-Host ""
 Write-Host "[OK] Tat ca servers dang chay:" -ForegroundColor Green
-Write-Host "     Demo Gallery       : https://friday.binhnguyen.io.vn/" -ForegroundColor Cyan
-Write-Host "     Domain Monitor     : https://friday.binhnguyen.io.vn/product/domain-reputation/" -ForegroundColor Cyan
-Write-Host "     Email Auth Checker : https://friday.binhnguyen.io.vn/product/email-auth-checker/" -ForegroundColor Cyan
+Write-Host "     Demo Gallery        : https://friday.binhnguyen.io.vn/" -ForegroundColor Cyan
+Write-Host "     Domain Monitor      : https://friday.binhnguyen.io.vn/product/domain-reputation/" -ForegroundColor Cyan
+Write-Host "     Email Auth Checker  : https://friday.binhnguyen.io.vn/product/email-auth-checker/" -ForegroundColor Cyan
 Write-Host "     SSL Health Dashboard: https://friday.binhnguyen.io.vn/product/ssl-health-dashboard/" -ForegroundColor Cyan
+Write-Host "     IP Reputation       : https://friday.binhnguyen.io.vn/product/ip-reputation/" -ForegroundColor Cyan
 Write-Host ""
 Start-Process "https://friday.binhnguyen.io.vn"
 
-# [5/5] Cloudflared tunnel (blocking — giu terminal mo)
-Write-Host "[5/5] Khoi dong cloudflared tunnel..." -ForegroundColor Yellow
+# [6/6] Cloudflared tunnel (blocking — giu terminal mo)
+Write-Host "[6/6] Khoi dong cloudflared tunnel..." -ForegroundColor Yellow
 Write-Host "Nhan Ctrl+C de dung tat ca." -ForegroundColor Gray
 Write-Host ""
 

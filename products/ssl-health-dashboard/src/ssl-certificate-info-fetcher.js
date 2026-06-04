@@ -12,7 +12,7 @@ export function fetchSslCertInfo(domain) {
       port: 443,
       method: 'HEAD',
       rejectUnauthorized: false,
-      timeout: 10000,
+      timeout: 5000,
     }
 
     const req = https.request(options, (res) => {
