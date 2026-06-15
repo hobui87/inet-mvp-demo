@@ -15,7 +15,7 @@ Công cụ nội bộ kiểm tra reputation của domain qua 6 blocklist. Trả 
 
 ```bash
 # Từ root monorepo
-pnpm dev:rep
+pnpm dev:domain-rep
 
 # Hoặc từ thư mục product
 cd products/domain-reputation

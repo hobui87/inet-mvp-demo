@@ -2,6 +2,10 @@
   "name": "weekly-friday-training",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10"
+  },
   "volta": {
     "node": "22.19.0",
     "pnpm": "10.29.3"
@@ -13,10 +17,14 @@
     "dev:domain-rep": "pnpm --filter domain-reputation-monitor dev",
     "dev:email-auth": "pnpm --filter email-auth-checker dev",
     "dev:ssl-health": "pnpm --filter ssl-health-dashboard dev",
-    "dev:ip-rep": "pnpm --filter ip-reputation-checker dev"
+    "dev:ip-rep": "pnpm --filter ip-reputation-checker dev",
+    "dev:all": "concurrently -n hub,domain-rep,email,ssl,ip -c blue,green,yellow,magenta,cyan \"pnpm dev:hub\" \"pnpm dev:domain-rep\" \"pnpm dev:email-auth\" \"pnpm dev:ssl-health\" \"pnpm dev:ip-rep\""
   },
   "dependencies": {
     "@hono/node-server": "^1.13.7",
     "hono": "^4.7.10"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
   }
 }
