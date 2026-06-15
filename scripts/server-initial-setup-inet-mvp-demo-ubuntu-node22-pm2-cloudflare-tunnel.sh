@@ -19,6 +19,12 @@ APP_DOMAIN="huongthao.io.vn"
 HUB_PORT=9030
 OLD_DEPLOY_DIR="$HOME/inet-mvp-demo"
 
+# Thông tin SSH cho GitHub Actions deploy (chỉ in ra hướng dẫn, không hardcode).
+# Override khi chạy:  SSH_HOST=1.2.3.4 SSH_USERNAME=user SSH_PORT=22 bash setup.sh
+SSH_HOST="${SSH_HOST:-<server-ip>}"
+SSH_USERNAME="${SSH_USERNAME:-<server-user>}"
+SSH_PORT="${SSH_PORT:-22}"
+
 echo ""
 echo "======================================================"
 echo "  Setup: ${APP_DOMAIN} → ${DEPLOY_DIR}"
@@ -150,8 +156,8 @@ echo "  Thêm GitHub Secrets tại:"
 echo "  https://github.com/${GITHUB_REPO}/settings/secrets/actions"
 echo ""
 echo "  Cần 4 secrets:"
-echo "    SSH_HOST=103.75.184.106"
-echo "    SSH_USERNAME=tigerbui"
-echo "    SSH_PORT=24700"
+echo "    SSH_HOST=${SSH_HOST}"
+echo "    SSH_USERNAME=${SSH_USERNAME}"
+echo "    SSH_PORT=${SSH_PORT}"
 echo "    SSH_PRIVATE_KEY=<nội dung file ~/.ssh/hobv_vps_ed25519 trên máy local>"
 echo "======================================================"
