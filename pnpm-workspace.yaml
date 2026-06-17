@@ -2,9 +2,15 @@ packages:
   - "dashboard"
   - "products/*"
 
-# Native deps allowed to run install/build scripts. Required by pnpm 10+/11,
-# which block build scripts by default (pnpm 11 makes this a hard error).
-# This is the canonical location — pnpm 11 no longer reads the "pnpm" field in package.json.
+# Native deps allowed to run install/build scripts. pnpm blocks build scripts by
+# default (pnpm 11 makes this a hard ERR_PNPM_IGNORED_BUILDS error). The key was
+# renamed in pnpm 11: `allowBuilds` (map) replaces `onlyBuiltDependencies` (list).
+# Both are kept so this works on pnpm 11 (production) and pnpm 10 (local) alike;
+# pnpm silently ignores the key it doesn't recognize.
+allowBuilds:
+  better-sqlite3: true
+  esbuild: true
+  sharp: true
 onlyBuiltDependencies:
   - better-sqlite3
   - esbuild
