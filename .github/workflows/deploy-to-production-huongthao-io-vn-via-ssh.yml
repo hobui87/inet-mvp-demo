@@ -22,8 +22,13 @@ jobs:
 
             cd ~/inet-mvp-demo
 
-            # Pull latest code (uses GitHub deploy key configured during setup)
-            git pull origin main
+            # Sync to latest code. Use fetch + hard reset (not pull) so the deploy
+            # target always mirrors origin/main exactly. This discards local drift on
+            # tracked files (e.g. previously-committed node_modules that pnpm rewrote
+            # locally) which would otherwise abort a merge. Untracked files such as
+            # .env, *.db and native build artifacts are left intact.
+            git fetch origin main
+            git reset --hard origin/main
 
             # Install root dependencies
             pnpm install --no-frozen-lockfile
