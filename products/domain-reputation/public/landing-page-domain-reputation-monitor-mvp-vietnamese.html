@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>N5 Domain Reputation Monitor — Kiểm tra uy tín domain tức thì</title>
-  <meta name="description" content="Đừng click trước khi kiểm tra. N5 kiểm tra domain qua 6 nguồn blacklist quốc tế trong vài giây — không đăng ký, không cài đặt. Bulk scan 50 domain cùng lúc." />
+  <title>N5 Domain Reputation Monitor — Kiểm tra domain miễn phí</title>
+  <meta name="description" content="Kiểm tra uy tín domain qua 6 nguồn blocklist quốc tế. Score 0–100 trực quan. Bulk scan 50 domain/lần. Miễn phí, không cần đăng ký." />
   <meta property="og:title" content="N5 Domain Reputation Monitor – Free Domain Security Check" />
   <meta property="og:description" content="Check domain reputation across 6 global blocklists. Instant score 0–100. Free bulk scan up to 50 domains." />
   <meta property="og:type" content="website" />
@@ -25,8 +25,7 @@
       --card-hover:  #252525;
       --border:      #2a2a2a;
       --border-2:    #333333;
-      --accent:      #49c98d;          /* ONE green  — viui: one.green  */
-      --one-orange:  #f7ad30;          /* ONE orange — viui: one.orange */
+      --accent:      #49c98d;
       --accent-glow: rgba(73,201,141,.12);
       --accent-soft: rgba(73,201,141,.25);
       --clean:       #49c98d;
@@ -95,56 +94,14 @@
       white-space: nowrap;
     }
     .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-    /* ── DNA Button B-02 · Sunrise Gradient (ONE Series)
-       Gradient #49c98d → #f7ad30, dịch background-position khi hover.
-       Text dark #0d0d0d — WCAG ≥7:1 trên cả green lẫn orange.
-       ─────────────────────────────────────────────────────── */
     .btn-primary {
-      position: relative;
-      overflow: hidden;
-      background: linear-gradient(90deg,
-        #49c98d 0%, #5dd49a 25%,
-        #f7ad30 65%, #fbbe52 100%);
-      background-size: 230% 100%;
-      background-position: 0% center;
-      color: #0d0d0d;
+      background: var(--accent);
+      color: #000;
       font-size: 15px;
-      font-weight: 700;
       padding: 13px 26px;
-      border-radius: 9999px;
-      border: none;
-      box-shadow: 0 4px 18px rgba(73,201,141,.35);
-      transition: background-position .45s ease,
-                  box-shadow .3s ease,
-                  transform .18s ease;
     }
-    /* shimmer overlay */
-    .btn-primary::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        105deg,
-        transparent 35%,
-        rgba(255,255,255,.28) 50%,
-        transparent 65%
-      );
-      background-size: 250% 100%;
-      background-position: 120% center;
-      pointer-events: none;
-      border-radius: inherit;
-      transition: background-position .55s ease;
-    }
-    .btn-primary:hover {
-      background-position: 100% center;
-      box-shadow: 0 6px 28px rgba(247,173,48,.45),
-                  0 2px 10px rgba(73,201,141,.2);
-      transform: translateY(-1px);
-      color: #0d0d0d;
-    }
-    .btn-primary:hover::after { background-position: -20% center; }
-    .btn-primary:active       { transform: translateY(0); }
-    .btn-primary svg          { color: #0d0d0d; }
+    .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
     .btn-ghost {
       background: transparent;
       color: var(--txt);
@@ -152,7 +109,7 @@
       padding: 13px 26px;
       border: 1px solid var(--border-2);
     }
-    .btn-ghost:hover { border-color: var(--accent); background: var(--accent-glow); color: var(--accent); }
+    .btn-ghost:hover { border-color: var(--txt-2); background: var(--surface); }
     .btn-sm {
       font-size: 13px;
       padding: 9px 18px;
@@ -206,8 +163,7 @@
       gap: 6px;
       list-style: none;
     }
-    .nav-links li:last-child { margin-left: 6px; }
-    .nav-links a:not(.btn) {
+    .nav-links a {
       font-size: 14px;
       font-weight: 500;
       color: var(--txt-2);
@@ -215,8 +171,8 @@
       border-radius: var(--r-sm);
       transition: color var(--transition), background var(--transition);
     }
-    .nav-links a:not(.btn):hover { color: var(--txt); background: var(--surface); }
-    .nav-links a:not(.btn):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-links a:hover { color: var(--txt); background: var(--surface); }
+    .nav-links a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
     /* ─── HERO ─── */
     #hero {
@@ -738,19 +694,6 @@
     }
     .cta-scan-btn:hover { opacity: 0.88; }
     .cta-scan-btn:focus-visible { outline: 2px solid var(--txt); outline-offset: -3px; }
-    /* Hero scan form — left-aligned, not centered */
-    .hero-scan-form { margin: 0 0 12px; }
-    .hero-bulk-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 13px;
-      color: var(--txt-3);
-      text-decoration: none;
-      margin-bottom: 28px;
-      transition: color var(--transition);
-    }
-    .hero-bulk-link:hover { color: var(--accent); }
 
     /* ─── FOOTER ─── */
     footer {
@@ -838,13 +781,13 @@
       <li><a href="#features">Tính năng</a></li>
       <li><a href="#usecases">Đối tượng</a></li>
       <li>
-        <a href="app.html" class="btn btn-primary btn-sm">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"/><path d="M21 21l-6 -6"/></svg>
+        <a href="/" class="btn btn-primary btn-sm" style="margin-left:8px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           Dùng thử ngay
         </a>
       </li>
     </ul>
-    <a href="app.html" class="btn btn-primary btn-sm nav-cta-mobile" aria-label="Dùng thử N5 ngay">Dùng thử ngay</a>
+    <a href="/" class="btn btn-primary btn-sm nav-cta-mobile" aria-label="Dùng thử N5 ngay">Dùng thử ngay</a>
   </div>
 </nav>
 
@@ -860,58 +803,46 @@
         <span class="hero-eyebrow-dot" aria-hidden="true"></span>
         N5 Domain Reputation Monitor
         <span>·</span>
-        <span>Public Access · Không đăng ký</span>
+        <span>Miễn phí · Không đăng ký</span>
       </div>
 
       <h1 class="hero-h1">
-        Đừng click<br>
-        <em>trước khi bạn biết</em><br>
-        domain đó là gì.
+        Biết domain<br>
+        <em>an toàn hay rủi ro</em><br>
+        trong 3 giây.
       </h1>
 
       <p class="hero-sub">
-        Link lạ, domain nhà cung cấp, hay domain gửi email chiến dịch — kiểm tra qua 6 nguồn blacklist quốc tế trong vài giây. Không đăng ký, không cài đặt.
+        Kiểm tra qua 6 nguồn blocklist quốc tế, score 0–100 trực quan, bulk scan 50 domain cùng lúc. Hoàn toàn miễn phí — không cần tài khoản.
       </p>
 
-      <form class="cta-scan-form hero-scan-form" action="app.html" method="get" aria-label="Form quét domain nhanh">
-        <label for="hero-domain" class="sr-only">Nhập tên miền cần kiểm tra</label>
-        <input
-          id="hero-domain"
-          class="cta-scan-input"
-          type="text"
-          name="domain"
-          placeholder="Nhập domain, vd: inet.vn"
-          autocomplete="off"
-          autocapitalize="none"
-          spellcheck="false"
-          autofocus
-        />
-        <button type="submit" class="cta-scan-btn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"/><path d="M21 21l-6 -6"/></svg>
-          Scan ngay
-        </button>
-      </form>
-      <a href="app.html" class="hero-bulk-link">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l11 0"/><path d="M9 12l11 0"/><path d="M9 18l11 0"/><path d="M5 6l0 .01"/><path d="M5 12l0 .01"/><path d="M5 18l0 .01"/></svg>
-        Thử Bulk Scan 50 domain →
-      </a>
+      <div class="hero-ctas">
+        <a href="/" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Kiểm tra ngay — Miễn phí
+        </a>
+        <a href="/" class="btn btn-ghost">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="4" rx="1"/><rect x="3" y="10" width="18" height="4" rx="1"/><rect x="3" y="17" width="18" height="4" rx="1"/></svg>
+          Thử Bulk Scan
+        </a>
+      </div>
 
       <div class="hero-trust" aria-label="Cam kết bảo mật">
         <div class="hero-trust-item">
           <span class="hero-trust-check" aria-hidden="true">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
           </span>
           Không lưu dữ liệu server (lịch sử lưu cục bộ)
         </div>
         <div class="hero-trust-item">
           <span class="hero-trust-check" aria-hidden="true">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
           </span>
           Realtime, không cache
         </div>
         <div class="hero-trust-item">
           <span class="hero-trust-check" aria-hidden="true">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
           </span>
           Không cần API key
         </div>
@@ -945,7 +876,7 @@
             </div>
           </div>
           <div class="sw-grade-info">
-            <div class="sw-grade-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5l10 -10"/></svg> CLEAN</div>
+            <div class="sw-grade-badge"><span aria-hidden="true">✓</span> CLEAN</div>
             <div class="sw-domain">inet.vn</div>
             <div class="sw-meta">Quét lúc 11:42 AM · 2.8s</div>
           </div>
@@ -954,28 +885,28 @@
         <div class="sw-bl-list" aria-label="Kết quả 6 blocklist">
           <div class="sw-bl-row">
             <div class="sw-bl-icon ok" aria-hidden="true">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
             <span class="sw-bl-name">Google Safe Browsing</span>
             <span class="sw-bl-status ok">Sạch</span>
           </div>
           <div class="sw-bl-row">
             <div class="sw-bl-icon ok" aria-hidden="true">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
             <span class="sw-bl-name">Phishing Army Feed</span>
             <span class="sw-bl-status ok">Sạch</span>
           </div>
           <div class="sw-bl-row">
             <div class="sw-bl-icon ok" aria-hidden="true">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
             <span class="sw-bl-name">DNS Zone Blacklist</span>
             <span class="sw-bl-status ok">Sạch</span>
           </div>
           <div class="sw-bl-row" style="opacity:.5">
             <div class="sw-bl-icon ok" aria-hidden="true">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
             <span class="sw-bl-name">+ 3 nguồn khác</span>
             <span class="sw-bl-status ok">Sạch</span>
@@ -994,27 +925,27 @@
     <span class="strip-label">Nguồn kiểm tra</span>
     <div class="strip-sources">
       <div class="strip-badge">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3"/></svg>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         Google Safe Browsing API v4+v5
       </div>
       <div class="strip-badge">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3"/></svg>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         Phishing Army Community Feed
       </div>
       <div class="strip-badge">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3"/></svg>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         DNS Zone Blacklist Checker
       </div>
       <div class="strip-badge">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3"/></svg>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         SURBL Multi-Blocklist
       </div>
       <div class="strip-badge">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3"/></svg>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         Spamhaus DBL
       </div>
       <div class="strip-badge">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3"/></svg>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         Barracuda Central
       </div>
     </div>
@@ -1038,8 +969,8 @@
         <div class="stat-desc">Domain tối đa<br>mỗi lần bulk</div>
       </div>
       <div class="stat-box">
-        <div class="stat-num"><em>0</em></div>
-        <div class="stat-desc">Setup cần thiết<br>dùng ngay lập tức</div>
+        <div class="stat-num"><em>∞</em></div>
+        <div class="stat-desc">Miễn phí mãi<br>không giới hạn</div>
       </div>
     </div>
   </div>
@@ -1049,49 +980,49 @@
 <section id="how" aria-labelledby="how-title">
   <div class="container">
     <div class="how-header">
-      <span class="label">Đơn giản thế thôi</span>
-      <h2 class="section-title" id="how-title">Mở trình duyệt.<br>Nhập domain. Xong.</h2>
-      <p class="section-sub">Không cài đặt, không tài khoản. Kết quả từ 6 nguồn blacklist uy tín xuất hiện ngay lập tức.</p>
+      <span class="label">Cách hoạt động</span>
+      <h2 class="section-title" id="how-title">3 bước — không cần<br>cài đặt hay tài khoản</h2>
+      <p class="section-sub">Mở trình duyệt, nhập domain và nhận kết quả ngay lập tức từ 6 nguồn blocklist uy tín.</p>
     </div>
     <div class="steps-row">
       <!-- Step 1 -->
       <div class="step-item">
         <div class="step-num-badge" aria-hidden="true">1</div>
         <div class="step-icon-box" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/><path d="M9 17h6"/><path d="M9 13h6"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="13" y2="13"/></svg>
         </div>
-        <h3>Dán domain vào</h3>
-        <p>Domain đơn, URL đầy đủ, hay danh sách nhiều domain — hệ thống tự tách, không cần format chuẩn tay.</p>
+        <h3>Nhập domain cần kiểm tra</h3>
+        <p>Dán domain, URL hoặc danh sách nhiều domain vào ô tìm kiếm. Hệ thống tự tách tên domain từ URL.</p>
       </div>
 
       <!-- Connector -->
       <div class="step-connector" aria-hidden="true">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
 
       <!-- Step 2 -->
       <div class="step-item">
         <div class="step-num-badge" aria-hidden="true">2</div>
         <div class="step-icon-box" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         </div>
-        <h3>N5 truy vấn song song</h3>
-        <p>6 nguồn blacklist — Google Safe Browsing, Phishing Army, DNS zone và nhiều hơn — được truy vấn cùng lúc. Không chờ lần lượt.</p>
+        <h3>Hệ thống kiểm tra realtime</h3>
+        <p>N5 đồng thời truy vấn 6 nguồn blocklist — Google Safe Browsing, Phishing Army, DNS zone và nhiều hơn.</p>
       </div>
 
       <!-- Connector -->
       <div class="step-connector" aria-hidden="true">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
 
       <!-- Step 3 -->
       <div class="step-item">
         <div class="step-num-badge" aria-hidden="true">3</div>
         <div class="step-icon-box" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"/><path d="M9 8m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"/><path d="M15 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"/><path d="M4 20l14 0"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6"  y1="20" x2="6"  y2="14"/></svg>
         </div>
-        <h3>Score rõ ràng, ra quyết định ngay</h3>
-        <p>Xanh là an toàn. Đỏ là nguy hiểm. Không cần đọc báo cáo dài — nhìn score là biết nên làm gì.</p>
+        <h3>Đọc kết quả, ra quyết định</h3>
+        <p>Score 0–100 trực quan với màu sắc, chi tiết từng blocklist, và khuyến nghị hành động cụ thể.</p>
       </div>
     </div>
   </div>
@@ -1101,9 +1032,9 @@
 <section id="features" aria-labelledby="features-title">
   <div class="container">
     <div class="features-header">
-      <span class="label">Tại sao N5</span>
-      <h2 class="section-title" id="features-title">Ít công đoạn hơn.<br>Kết quả toàn diện hơn.</h2>
-      <p class="section-sub">Một domain bẩn đủ để phá chiến dịch email, dẫn phishing vào inbox, hoặc kéo reputation tổ chức xuống. N5 cho bạn biết trước.</p>
+      <span class="label">Tính năng</span>
+      <h2 class="section-title" id="features-title">Mọi thứ bạn cần<br>trong một công cụ</h2>
+      <p class="section-sub">Từ kiểm tra đơn lẻ đến audit hàng loạt, N5 bao phủ toàn bộ nhu cầu bảo mật domain.</p>
     </div>
 
     <div class="bento" role="list">
@@ -1111,10 +1042,10 @@
       <!-- Card 1: 6 Blocklists (5/12) -->
       <div class="bento-card" role="listitem">
         <div class="bento-icon" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
         <h3>6 Nguồn Blocklist</h3>
-        <p>6 nguồn trong 1 lần — thay vì phải tra từng trang riêng. Tra hết, không bỏ sót.</p>
+        <p>Kết hợp 6 nguồn uy tín quốc tế trong một lần kiểm tra duy nhất — không bỏ sót nguồn nào.</p>
         <div class="bento-bl-list" aria-label="Danh sách nguồn blocklist">
           <div class="bento-bl-row"><div class="bento-bl-dot" aria-hidden="true"></div>Google Safe Browsing (API v4 + v5)</div>
           <div class="bento-bl-row"><div class="bento-bl-dot" aria-hidden="true"></div>Phishing Army Community Feed</div>
@@ -1127,10 +1058,10 @@
       <!-- Card 2: Score (4/12) -->
       <div class="bento-card" role="listitem">
         <div class="bento-icon" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"/><path d="M5.75 15a8.015 8.015 0 1 0 9.25 -13"/><path d="M11 17v4"/><path d="M7 21h8"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg>
         </div>
         <h3>Score 0–100 Trực Quan</h3>
-        <p>Không cần đọc báo cáo. Xanh = yên tâm. Đỏ = cần xử lý ngay. Điểm có trọng số theo mức độ uy tín từng nguồn.</p>
+        <p>Điểm tổng hợp có trọng số — Xanh là sạch, Vàng cần thận trọng, Đỏ là nguy hiểm cao. Ra quyết định ngay, không cần đọc báo cáo dài.</p>
         <span class="bento-tag">Dễ hiểu</span>
       </div>
 
@@ -1138,41 +1069,41 @@
       <div class="bento-card" role="listitem" style="display:flex; flex-direction:column; justify-content:space-between;">
         <div>
           <div class="bento-icon" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z"/></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
           </div>
-          <h3>Dùng Ngay, Không Hỏi</h3>
-          <p>Không thẻ tín dụng. Không tài khoản. Không địa chỉ email.</p>
+          <h3>Miễn Phí Mãi Mãi</h3>
+          <p>Không thẻ tín dụng. Không tài khoản. Không giới hạn lượt dùng.</p>
         </div>
-        <span class="bento-tag">Public Access</span>
+        <span class="bento-tag">Free forever</span>
       </div>
 
       <!-- Card 4: Bulk (3/12) -->
       <div class="bento-card" role="listitem">
         <div class="bento-icon" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l11 0"/><path d="M9 12l11 0"/><path d="M9 18l11 0"/><path d="M5 6l0 .01"/><path d="M5 12l0 .01"/><path d="M5 18l0 .01"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="4" rx="1"/><rect x="3" y="10" width="18" height="4" rx="1"/><rect x="3" y="17" width="18" height="4" rx="1"/></svg>
         </div>
         <h3>Bulk Scan 50 Domain</h3>
-        <p>Dán cả danh sách vendor, email list, hay domain cần audit. Kết quả đồng loạt, xuất CSV. Hiếm tool nào public làm được vậy.</p>
+        <p>Dán danh sách, nhận kết quả tất cả cùng lúc, xuất CSV. Tính năng hiếm ở công cụ miễn phí.</p>
         <span class="bento-tag">Tiết kiệm thời gian</span>
       </div>
 
       <!-- Card 5: History (4/12) -->
       <div class="bento-card" role="listitem">
         <div class="bento-icon" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8l0 4l2 2"/><path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.1"/></svg>
         </div>
         <h3>Lịch Sử 30 Ngày</h3>
-        <p>Domain bị list lúc nào bạn không hay — nếu không theo dõi. N5 lưu 30 ngày lịch sử để bạn biết ngay khi có thay đổi.</p>
+        <p>Theo dõi uy tín domain theo thời gian, phát hiện sớm khi domain bị đưa vào blacklist để kịp thời xử lý.</p>
         <span class="bento-tag">Theo dõi liên tục</span>
       </div>
 
       <!-- Card 6: API (5/12) -->
       <div class="bento-card" role="listitem">
         <div class="bento-icon" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8l-4 4l4 4"/><path d="M17 8l4 4l-4 4"/><path d="M14 4l-4 16"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
         </div>
         <h3>REST API cho Developer</h3>
-        <p>POST domain, nhận JSON. Không auth, không key. Tích hợp vào SIEM, CI/CD, hay monitoring nội bộ chỉ trong vài phút.</p>
+        <p>Tích hợp N5 vào hệ thống monitoring, SIEM, hoặc pipeline CI/CD của bạn qua API đơn giản với JSON response chuẩn. Không cần key.</p>
         <span class="bento-tag">Developer-friendly</span>
       </div>
 
@@ -1184,31 +1115,31 @@
 <section id="usecases" aria-labelledby="usecases-title">
   <div class="container">
     <div class="usecases-header">
-      <span class="label">Ai đang cần</span>
-      <h2 class="section-title" id="usecases-title">IT Admin, Marketer, Dev —<br>ai cũng cần biết domain nào rủi ro.</h2>
-      <p class="section-sub">Mỗi vai trò một loại rủi ro khác nhau. N5 giải quyết cùng lúc.</p>
+      <span class="label">Dành cho ai</span>
+      <h2 class="section-title" id="usecases-title">Mỗi vai trò,<br>một cách dùng khác nhau</h2>
+      <p class="section-sub">N5 phục vụ nhiều đối tượng trong doanh nghiệp — từ IT bảo mật đến marketing và developer.</p>
     </div>
 
     <div class="usecases-grid">
 
       <div class="usecase-card">
         <div class="uc-avatar" aria-hidden="true">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11.46 20.846a12 12 0 0 1 -7.96 -14.846a12 12 0 0 0 8.5 -3a12 12 0 0 0 8.5 3a12 12 0 0 1 -.09 7.06"/><path d="M15 19l2 2l4 -4"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
         <div class="uc-role">IT / Security Admin</div>
         <h3>Bảo vệ tổ chức khỏi phishing</h3>
-        <p>Link đáng ngờ trong email, domain nhà cung cấp mới, hay audit định kỳ — N5 cho kết quả trước khi bạn ra quyết định.</p>
+        <p>Xác minh domain trước khi mở link, kiểm tra nhà cung cấp trước ký hợp đồng, audit domain định kỳ.</p>
         <ul class="uc-checklist">
           <li>
-            <span class="uc-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></span>
+            <span class="uc-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
             Kiểm tra link đáng ngờ nhận qua email
           </li>
           <li>
-            <span class="uc-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></span>
+            <span class="uc-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
             Xác minh domain đối tác / nhà cung cấp
           </li>
           <li>
-            <span class="uc-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></span>
+            <span class="uc-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
             Audit hàng loạt danh sách domain whitelist
           </li>
         </ul>
@@ -1216,22 +1147,22 @@
 
       <div class="usecase-card">
         <div class="uc-avatar" aria-hidden="true">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z"/><path d="M3 7l9 6l9 -6"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
         </div>
         <div class="uc-role">Email Marketing Team</div>
         <h3>Tối ưu tỷ lệ vào inbox</h3>
-        <p>Domain gửi mail bị blacklist = cả chiến dịch vào spam. Kiểm tra trước khi launch là thói quen 5 giây có thể tránh được rủi ro đó.</p>
+        <p>Domain gửi mail bị blacklist là lý do phổ biến nhất khiến chiến dịch vào spam. Kiểm tra trước khi launch để bảo vệ deliverability.</p>
         <ul class="uc-checklist">
           <li>
-            <span class="uc-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></span>
+            <span class="uc-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
             Kiểm tra domain gửi trước chiến dịch
           </li>
           <li>
-            <span class="uc-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></span>
+            <span class="uc-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
             Audit domain trong danh sách email list
           </li>
           <li>
-            <span class="uc-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></span>
+            <span class="uc-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
             Monitor uy tín domain sau chiến dịch
           </li>
         </ul>
@@ -1239,22 +1170,22 @@
 
       <div class="usecase-card">
         <div class="uc-avatar" aria-hidden="true">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9l3 3l-3 3"/><path d="M13 15l3 0"/><path d="M3 4m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
         </div>
         <div class="uc-role">Developer / DevOps</div>
         <h3>Tích hợp vào hệ thống monitoring</h3>
-        <p>Không cần đăng ký API key. POST endpoint sẵn sàng — tự động hóa kiểm tra domain trong CI/CD, SIEM, hay webhook của bạn.</p>
+        <p>REST API đơn giản cho phép tự động hóa kiểm tra domain trong pipeline CI/CD, hệ thống SIEM, hoặc dashboard nội bộ.</p>
         <ul class="uc-checklist">
           <li>
-            <span class="uc-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></span>
+            <span class="uc-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
             Integrate API vào monitoring pipeline
           </li>
           <li>
-            <span class="uc-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></span>
+            <span class="uc-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
             Bulk check qua programmatic API call
           </li>
           <li>
-            <span class="uc-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></span>
+            <span class="uc-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
             Build alert khi domain thay đổi trạng thái
           </li>
         </ul>
@@ -1267,23 +1198,30 @@
 <!-- FINAL CTA -->
 <section id="cta" aria-labelledby="cta-title">
   <div class="cta-inner">
-    <span class="label">Dùng ngay</span>
-    <h2 class="section-title" id="cta-title">Paste domain.<br>Kết quả trong 3 giây.</h2>
-    <p class="section-sub">Không đăng ký. Không cài đặt. Không cần thẻ tín dụng. Chỉ cần nhập domain.</p>
+    <span class="label">Bắt đầu ngay</span>
+    <h2 class="section-title" id="cta-title">Kiểm tra domain đầu tiên của bạn<br>ngay bây giờ — miễn phí</h2>
+    <p class="section-sub">Không cần đăng ký. Không cần cài đặt. Chỉ cần nhập domain.</p>
 
-    <div class="cta-btns">
-      <a href="app.html" class="btn btn-primary">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"/><path d="M21 21l-6 -6"/></svg>
-        Kiểm tra ngay — Không cần đăng ký
-      </a>
-      <a href="app.html" class="btn btn-ghost">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l11 0"/><path d="M9 12l11 0"/><path d="M9 18l11 0"/><path d="M5 6l0 .01"/><path d="M5 12l0 .01"/><path d="M5 18l0 .01"/></svg>
-        Thử Bulk Scan
-      </a>
-    </div>
+    <form class="cta-scan-form" action="/" method="get" aria-label="Form quét domain nhanh">
+      <label for="cta-domain" class="sr-only">Nhập tên miền cần kiểm tra</label>
+      <input
+        id="cta-domain"
+        class="cta-scan-input"
+        type="text"
+        name="domain"
+        placeholder="Nhập domain, vd: inet.vn"
+        autocomplete="off"
+        autocapitalize="none"
+        spellcheck="false"
+      />
+      <button type="submit" class="cta-scan-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Scan
+      </button>
+    </form>
 
     <p class="cta-note">
-      <strong>Đang Public</strong> · Không thẻ tín dụng · Không tài khoản
+      <strong>Miễn phí mãi mãi</strong> · Không thẻ tín dụng · Không tài khoản
     </p>
   </div>
 </section>
@@ -1298,12 +1236,12 @@
       <span>— ONE Series by iNET</span>
     </div>
     <ul class="footer-links">
-      <li><a href="app.html">Ứng dụng</a></li>
+      <li><a href="/">Ứng dụng</a></li>
       <li><a href="#how">Cách dùng</a></li>
       <li><a href="#features">Tính năng</a></li>
       <li><a href="#usecases">Đối tượng</a></li>
     </ul>
-    <p class="footer-copy">© 2026 iNET · ONE Series · N5 Domain Reputation Monitor · Không thu thập dữ liệu cá nhân</p>
+    <p class="footer-copy">© 2026 iNET · ONE Series · N5 Domain Reputation Monitor · Miễn phí, không thu thập dữ liệu cá nhân</p>
   </div>
 </footer>
 
