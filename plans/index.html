@@ -267,6 +267,11 @@
     .stat { display: flex; flex-direction: column; gap: 2px; }
     .stat-value { font-size: 22px; font-weight: 700; color: var(--navy); }
     .stat-label { font-size: 11px; color: var(--gray-500); }
+    .stat[data-filter] { cursor: pointer; border-radius: 8px; padding: 6px 10px; margin: -6px -10px; transition: background 0.15s; user-select: none; }
+    .stat[data-filter]:hover { background: var(--navy-light); }
+    .stat[data-filter].stat-active { background: var(--navy); }
+    .stat[data-filter].stat-active .stat-value,
+    .stat[data-filter].stat-active .stat-label { color: #fff; }
 
     /* Live Products section */
     .live-section {
@@ -409,6 +414,61 @@
     .md-content hr { border: none; border-top: 1px solid var(--gray-200); margin: 20px 0; }
     .md-content strong { font-weight: 700; }
     .md-content em { font-style: italic; }
+
+    /* Suggestion dropdown */
+    .suggestions-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0; right: 0;
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(2,71,153,0.12);
+      z-index: 200;
+      overflow: hidden;
+      animation: fadeSlideDown 0.12s ease;
+    }
+    @keyframes fadeSlideDown {
+      from { opacity: 0; transform: translateY(-4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .suggestions-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px 4px;
+      font-size: 10px; font-weight: 600; letter-spacing: 0.8px;
+      color: var(--gray-500); text-transform: uppercase;
+    }
+    .suggestions-list { list-style: none; }
+    .suggestion-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.1s;
+    }
+    .suggestion-item:hover, .suggestion-item.active {
+      background: var(--navy-light);
+    }
+    .suggestion-icon { font-size: 13px; flex-shrink: 0; width: 20px; text-align: center; }
+    .suggestion-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .suggestion-type {
+      font-size: 10px; padding: 1px 5px; border-radius: 10px;
+      background: var(--gray-100); color: var(--gray-500);
+      flex-shrink: 0;
+    }
+    .btn-clear-recent {
+      background: none; border: none; cursor: pointer;
+      font-size: 10px; color: var(--navy); padding: 2px 6px;
+      border-radius: 4px; font-weight: 600;
+    }
+    .btn-clear-recent:hover { background: var(--navy-light); }
+    #content-index-status {
+      font-size: 11px;
+      color: var(--gray-500);
+      white-space: nowrap;
+      transition: opacity 0.5s;
+    }
+    #content-index-status.content-indexed { color: #16a34a; }
   </style>
 </head>
 <body>
@@ -421,7 +481,7 @@
   <div class="spacer"></div>
   <div class="meta">
     friday.binhnguyen.io.vn<br>
-    Cập nhật: 2026-06-04 (incident report + 3 sự cố xử lý)
+    Cập nhật: 2026-06-09 (ViUI ONE Brand UI — Domain Reputation Monitor)
   </div>
 </header>
 
@@ -431,19 +491,26 @@
   <div class="search-bar">
     <div class="search-wrap">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input id="search-input" type="text" placeholder="Tìm kiếm demo, plan, tag..." autocomplete="off" />
+      <input id="search-input" type="text" placeholder="Tìm kiếm demo, plan, tag... (hoặc nhấn /)" autocomplete="off" />
       <button id="search-clear" title="Xóa tìm kiếm">✕</button>
+      <div class="suggestions-dropdown" id="suggestions-dropdown" style="display:none;">
+        <div class="suggestions-header">
+          <span id="suggestions-label">Gợi ý</span>
+          <button class="btn-clear-recent" id="btn-clear-recent" style="display:none;">Xóa lịch sử</button>
+        </div>
+        <ul class="suggestions-list" id="suggestions-list"></ul>
+      </div>
     </div>
     <span id="search-count"></span>
   </div>
 
   <!-- Stats -->
   <div class="stats-bar">
-    <div class="stat"><span class="stat-value">30</span><span class="stat-label">Tổng demo</span></div>
-    <div class="stat"><span class="stat-value">10</span><span class="stat-label">Plans đang có demo</span></div>
-    <div class="stat"><span class="stat-value">2</span><span class="stat-label">Đã duyệt</span></div>
-    <div class="stat"><span class="stat-value">3</span><span class="stat-label">Đang review</span></div>
-    <div class="stat"><span class="stat-value">24</span><span class="stat-label">Chờ review</span></div>
+    <div class="stat" data-filter="all" title="Hiện tất cả"><span class="stat-value">35</span><span class="stat-label">Tổng demo</span></div>
+    <div class="stat"><span class="stat-value">11</span><span class="stat-label">Plans đang có demo</span></div>
+    <div class="stat" data-filter="approved" title="Lọc: Đã duyệt"><span class="stat-value">2</span><span class="stat-label">Đã duyệt ↑</span></div>
+    <div class="stat" data-filter="reviewing" title="Lọc: Đang review"><span class="stat-value">3</span><span class="stat-label">Đang review ↑</span></div>
+    <div class="stat" data-filter="pending" title="Lọc: Chờ review"><span class="stat-value">29</span><span class="stat-label">Chờ review ↑</span></div>
   </div>
 
   <!-- Live Products -->
@@ -536,6 +603,106 @@
           <a class="btn-open btn-live" href="/product/ip-reputation/" target="_blank">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
             Mở sản phẩm
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Research: Vietnam Market & MVP Opportunities — Team Research (260609) -->
+  <div class="plan-group">
+    <div class="plan-header">
+      <h2>Research — Thị Trường Hà Nội/VN & MVP Opportunities (Team Research)</h2>
+      <span class="plan-date">2026-06-09</span>
+      <span class="plan-badge">research</span>
+    </div>
+    <div class="demo-grid">
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">🗺️ Research Summary — Thị Trường VN, Cạnh Tranh & Định Hướng MVP (Team 3 Researchers)</div>
+          <div class="card-meta">
+            <span class="tag">reports/</span>
+            <span class="tag">tổng hợp</span>
+            <span class="tag">3 researchers</span>
+            <span class="tag">top-3 products</span>
+            <span class="tag">go-to-market</span>
+          </div>
+          <span class="status-badge pending">Sẵn sàng dùng</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-06-09</span>
+          <a class="btn-open" href="reports/research-summary-260609-0818-vn-market-mvp-research.md" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Tổng Hợp
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">📊 Researcher 1 — Thị Trường SME VN, Pain Points & Kênh Tiếp Cận</div>
+          <div class="card-meta">
+            <span class="tag">reports/</span>
+            <span class="tag">SME 98%</span>
+            <span class="tag">phishing threat</span>
+            <span class="tag">$10-50/tháng</span>
+            <span class="tag">white-label</span>
+          </div>
+          <span class="status-badge pending">Sẵn sàng dùng</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-06-09</span>
+          <a class="btn-open" href="reports/researcher-1-260609-0819-vn-market-mvp-research.md" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Báo Cáo
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">⚔️ Researcher 2 — Competitive Landscape & 3 Khoảng Trống Thị Trường VN</div>
+          <div class="card-meta">
+            <span class="tag">reports/</span>
+            <span class="tag">MXToolbox vs iNET</span>
+            <span class="tag">PDPL 2026</span>
+            <span class="tag">language gap</span>
+            <span class="tag">$310M market</span>
+          </div>
+          <span class="status-badge pending">Sẵn sàng dùng</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-06-09</span>
+          <a class="btn-open" href="reports/researcher-2-260609-0820-vn-market-mvp-research.md" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Báo Cáo
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">💡 Researcher 3 — Đánh Giá MVP Hiện Có & 8 Ý Tưởng Sản Phẩm Mới cho Thị Trường VN</div>
+          <div class="card-meta">
+            <span class="tag">reports/</span>
+            <span class="tag">scoring 8.2-6.1</span>
+            <span class="tag">Email Dashboard</span>
+            <span class="tag">PDPL Toolkit</span>
+            <span class="tag">CF Tunnel Monitor</span>
+          </div>
+          <span class="status-badge pending">Sẵn sàng dùng</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-06-09</span>
+          <a class="btn-open" href="reports/researcher-3-260609-0820-vn-market-mvp-research.md" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Báo Cáo
           </a>
         </div>
       </div>
@@ -1129,6 +1296,69 @@
         </div>
       </div>
 
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">MVP UI/UX Update — Hero Section, Trust Chips, Footer, SEO Meta</div>
+          <div class="card-meta">
+            <span class="tag">products/domain-reputation/public/</span>
+            <span class="tag">html</span>
+            <span class="tag">css</span>
+            <span class="tag">mvp</span>
+          </div>
+          <span class="status-badge pending">Chờ review</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-06-09</span>
+          <a class="btn-open" href="../products/domain-reputation/public/index.html" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Demo
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">MVP Landing Page — Trang Marketing N5 Domain Reputation Monitor</div>
+          <div class="card-meta">
+            <span class="tag">products/domain-reputation/public/</span>
+            <span class="tag">html</span>
+            <span class="tag">content-marketing</span>
+            <span class="tag">mvp</span>
+          </div>
+          <span class="status-badge pending">Chờ review</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-06-09</span>
+          <a class="btn-open" href="../products/domain-reputation/public/index.html" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Demo
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-top pending"></div>
+        <div class="card-body">
+          <div class="card-name">ViUI ONE Brand — Landing Page N5 Domain Reputation (ViUI MCP + brand One #49c98d)</div>
+          <div class="card-meta">
+            <span class="tag">products/domain-reputation/public/index.html</span>
+            <span class="tag">viui-mcp</span>
+            <span class="tag">brand-one</span>
+            <span class="tag">mvp</span>
+          </div>
+          <span class="status-badge pending">Chờ review</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">2026-06-09</span>
+          <a class="btn-open" href="../products/domain-reputation/public/index.html" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Xem Landing Page
+          </a>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -1185,8 +1415,8 @@
 
   <!-- Plan: 260528-1417 - N22 Email Authentication Health Checker -->
   <div class="plan-group">
-    <div class="plan-group-header">
-      <span class="plan-name">N22 — Email Authentication Health Checker</span>
+    <div class="plan-header">
+      <h2>N22 — Email Authentication Health Checker</h2>
       <span class="plan-badge">pending</span>
     </div>
     <div class="demo-grid">
@@ -1312,32 +1542,208 @@
 <script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
 <script>
   (function () {
-    const input = document.getElementById('search-input');
-    const clearBtn = document.getElementById('search-clear');
-    const countEl = document.getElementById('search-count');
+    const input      = document.getElementById('search-input');
+    const clearBtn   = document.getElementById('search-clear');
+    const countEl    = document.getElementById('search-count');
+    const dropdown   = document.getElementById('suggestions-dropdown');
+    const suggList   = document.getElementById('suggestions-list');
+    const suggLabel  = document.getElementById('suggestions-label');
+    const btnClearRecent = document.getElementById('btn-clear-recent');
     const totalCards = document.querySelectorAll('.demo-card').length;
-    let debounceTimer;
 
-    function normalize(str) {
-      return str.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    let statusFilter = null;
+    function getCardStatus(card) {
+      const top = card.querySelector('.card-top');
+      if (!top) return 'pending';
+      if (top.classList.contains('approved')) return 'approved';
+      if (top.classList.contains('reviewing')) return 'reviewing';
+      return 'pending';
     }
 
+    const STOPWORDS = new Set(['the','and','for','from','with','phase','plan','demo','part','into','that','this','are','has','have']);
+    const RECENT_KEY = 'friday-gallery-recent-searches';
+    const MAX_RECENT = 5;
+    const MAX_SUGGESTIONS = 6;
+
+    // --- Normalize ---
+    function normalize(str) {
+      return (str || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    }
+
+    // --- Extract URL slug terms ---
+    function slugTerms(href) {
+      const slug = href.split('/').pop().replace(/\.[^.]+$/, '');
+      return slug.split('-').filter(t => t.length > 2 && !STOPWORDS.has(t));
+    }
+
+    // --- Build search index (one object per card) ---
+    const searchIndex = Array.from(document.querySelectorAll('.demo-card')).map(card => {
+      const planGroup = card.closest('.plan-group');
+      const liveSection = card.closest('.live-section');
+      const groupHeader = planGroup?.querySelector('.plan-header h2')?.textContent
+                       || liveSection?.querySelector('.live-header h2')?.textContent || '';
+      const planDate   = planGroup?.querySelector('.plan-date')?.textContent || '';
+      const planBadge  = planGroup?.querySelector('.plan-badge')?.textContent || '';
+      const cardName   = card.querySelector('.card-name')?.textContent || '';
+      const tags       = Array.from(card.querySelectorAll('.tag')).map(t => t.textContent);
+      const status     = card.querySelector('.status-badge')?.textContent || '';
+      const cardDate   = card.querySelector('.card-date')?.textContent || '';
+      const href       = card.querySelector('a.btn-open')?.getAttribute('href') || '';
+      const urlTerms   = slugTerms(href).join(' ');
+      const haystack   = normalize([groupHeader, planDate, planBadge, cardName, ...tags, status, cardDate, urlTerms].join(' '));
+      return { card, cardName, tags, haystack };
+    });
+
+    // --- Build suggestion pool ---
+    const suggestionPool = [];
+    const seen = new Set();
+    function addSugg(text, type, icon) {
+      const key = text.trim().toLowerCase();
+      if (!key || seen.has(key)) return;
+      seen.add(key);
+      suggestionPool.push({ text: text.trim(), type, icon });
+    }
+    // Card names
+    document.querySelectorAll('.card-name').forEach(el => {
+      const t = el.textContent.trim();
+      addSugg(t, 'tên card', '📋');
+    });
+    // Tags
+    document.querySelectorAll('.tag').forEach(el => addSugg(el.textContent.trim(), 'tag', '🏷️'));
+    // Plan group titles
+    document.querySelectorAll('.plan-header h2, .live-header h2').forEach(el => addSugg(el.textContent.trim(), 'nhóm', '📁'));
+    // Plan badges
+    document.querySelectorAll('.plan-badge').forEach(el => addSugg(el.textContent.trim(), 'loại', '📋'));
+    // Dates
+    document.querySelectorAll('.plan-date, .card-date').forEach(el => {
+      const t = el.textContent.trim();
+      if (t && /\d{4}/.test(t)) addSugg(t, 'ngày', '📅');
+    });
+    // URL slug terms
+    document.querySelectorAll('a.btn-open').forEach(a => {
+      const href = a.getAttribute('href') || '';
+      slugTerms(href).forEach(t => addSugg(t, 'từ khóa', '🔍'));
+    });
+
+    // --- Recent searches ---
+    function getRecent() {
+      try { return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]'); } catch { return []; }
+    }
+    function addRecent(q) {
+      if (!q.trim()) return;
+      const list = getRecent().filter(x => x !== q.trim());
+      list.unshift(q.trim());
+      localStorage.setItem(RECENT_KEY, JSON.stringify(list.slice(0, MAX_RECENT)));
+    }
+    function clearRecent() {
+      localStorage.removeItem(RECENT_KEY);
+    }
+
+    // --- Suggestion state ---
+    let activeIndex = -1;
+    let currentItems = [];
+
+    function renderSuggestions(items, headerText, showClear) {
+      currentItems = items;
+      activeIndex = -1;
+      suggLabel.textContent = headerText;
+      btnClearRecent.style.display = showClear ? '' : 'none';
+      suggList.innerHTML = '';
+      items.forEach((item, i) => {
+        const li = document.createElement('li');
+        li.className = 'suggestion-item';
+        li.dataset.index = i;
+        li.innerHTML = `<span class="suggestion-icon">${item.icon}</span><span class="suggestion-text">${escapeHtml(item.text)}</span><span class="suggestion-type">${escapeHtml(item.type)}</span>`;
+        li.addEventListener('mousedown', function (e) {
+          e.preventDefault();
+          selectSuggestion(i);
+        });
+        suggList.appendChild(li);
+      });
+      dropdown.style.display = items.length ? '' : 'none';
+    }
+
+    function showSuggestionsForQuery(q) {
+      const nq = normalize(q);
+      const filtered = suggestionPool
+        .filter(s => normalize(s.text).includes(nq))
+        .sort((a, b) => {
+          const aStarts = normalize(a.text).startsWith(nq) ? 0 : 1;
+          const bStarts = normalize(b.text).startsWith(nq) ? 0 : 1;
+          return aStarts - bStarts;
+        })
+        .slice(0, MAX_SUGGESTIONS);
+      renderSuggestions(filtered, 'Gợi ý', false);
+    }
+
+    function showRecentSuggestions() {
+      const recent = getRecent();
+      if (!recent.length) { hideSuggestions(); return; }
+      const items = recent.map(t => ({ text: t, type: 'gần đây', icon: '🕐' }));
+      renderSuggestions(items, 'Gần đây', true);
+    }
+
+    function hideSuggestions() {
+      dropdown.style.display = 'none';
+      activeIndex = -1;
+      currentItems = [];
+    }
+
+    function selectSuggestion(i) {
+      const item = currentItems[i];
+      if (!item) return;
+      input.value = item.text;
+      addRecent(item.text);
+      filter(item.text);
+      hideSuggestions();
+    }
+
+    function updateActiveItem() {
+      Array.from(suggList.querySelectorAll('.suggestion-item')).forEach((li, i) => {
+        li.classList.toggle('active', i === activeIndex);
+      });
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // --- Highlight matches in card-name and tags ---
+    const originalTexts = new Map();
+    function highlightMatches(q) {
+      const nq = normalize(q.trim());
+      document.querySelectorAll('.card-name, .tag').forEach(el => {
+        if (!originalTexts.has(el)) originalTexts.set(el, el.innerHTML);
+        el.innerHTML = originalTexts.get(el); // restore first
+        if (!nq) return;
+        const text = el.textContent;
+        const nText = normalize(text);
+        const idx = nText.indexOf(nq);
+        if (idx === -1) return;
+        const before = text.slice(0, idx);
+        const match  = text.slice(idx, idx + q.trim().length);
+        const after  = text.slice(idx + q.trim().length);
+        el.innerHTML = escapeHtml(before) + `<mark style="background:#fef08a;border-radius:2px;padding:0 1px">${escapeHtml(match)}</mark>` + escapeHtml(after);
+      });
+    }
+    function clearHighlights() {
+      originalTexts.forEach((html, el) => { el.innerHTML = html; });
+    }
+
+    // --- Filter ---
+    let debounceTimer;
     function filter(query) {
       const q = normalize(query.trim());
       let visible = 0;
 
-      // Filter each card
-      document.querySelectorAll('.demo-card').forEach(card => {
-        const name = card.querySelector('.card-name')?.textContent || '';
-        const tags = Array.from(card.querySelectorAll('.tag')).map(t => t.textContent).join(' ');
-        const status = card.querySelector('.status-badge')?.textContent || '';
-        const haystack = normalize(name + ' ' + tags + ' ' + status);
-        const match = !q || haystack.includes(q);
+      searchIndex.forEach(({ card, haystack }) => {
+        const textMatch = !q || haystack.includes(q);
+        const statusMatch = !statusFilter || getCardStatus(card) === statusFilter;
+        const match = textMatch && statusMatch;
         card.style.display = match ? '' : 'none';
         if (match) visible++;
       });
 
-      // Hide empty plan groups and live section
       document.querySelectorAll('.plan-group').forEach(group => {
         const anyVisible = Array.from(group.querySelectorAll('.demo-card')).some(c => c.style.display !== 'none');
         group.style.display = anyVisible ? '' : 'none';
@@ -1348,30 +1754,162 @@
         liveSection.style.display = anyVisible ? '' : 'none';
       }
 
-      // No-results message
       document.getElementById('no-results').style.display = (visible === 0 && q) ? 'block' : 'none';
-
-      // Count
       countEl.textContent = q ? `${visible} / ${totalCards} kết quả` : '';
-
-      // Clear button
       clearBtn.style.display = q ? 'inline' : 'none';
+
+      if (q) highlightMatches(query.trim());
+      else clearHighlights();
     }
 
+    // --- Events ---
     input.addEventListener('input', function () {
       clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => filter(this.value), 250);
+      const val = this.value;
+      if (val.trim()) {
+        statusFilter = null;
+        document.querySelectorAll('.stat[data-filter]').forEach(s => s.classList.remove('stat-active'));
+      }
+      debounceTimer = setTimeout(() => {
+        filter(val);
+        if (val.trim().length > 0) showSuggestionsForQuery(val.trim());
+        else showRecentSuggestions();
+      }, 200);
+    });
+
+    input.addEventListener('focus', function () {
+      if (!this.value.trim()) showRecentSuggestions();
+      else showSuggestionsForQuery(this.value.trim());
+    });
+
+    input.addEventListener('keydown', function (e) {
+      if (dropdown.style.display !== 'none' && currentItems.length) {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          activeIndex = Math.min(activeIndex + 1, currentItems.length - 1);
+          updateActiveItem();
+          return;
+        }
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          activeIndex = Math.max(activeIndex - 1, -1);
+          updateActiveItem();
+          return;
+        }
+        if (e.key === 'Enter' && activeIndex >= 0) {
+          e.preventDefault();
+          selectSuggestion(activeIndex);
+          return;
+        }
+      }
+      if (e.key === 'Escape') {
+        if (dropdown.style.display !== 'none') { hideSuggestions(); return; }
+        input.value = ''; filter(''); clearHighlights();
+      }
+      if (e.key === 'Enter' && activeIndex < 0 && input.value.trim()) {
+        addRecent(input.value.trim());
+        hideSuggestions();
+      }
     });
 
     clearBtn.addEventListener('click', function () {
       input.value = '';
       filter('');
+      clearHighlights();
+      hideSuggestions();
       input.focus();
     });
 
-    input.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') { input.value = ''; filter(''); }
+    btnClearRecent.addEventListener('click', function (e) {
+      e.stopPropagation();
+      clearRecent();
+      hideSuggestions();
     });
+
+    document.addEventListener('click', function (e) {
+      if (!input.contains(e.target) && !dropdown.contains(e.target)) hideSuggestions();
+    });
+
+    // Keyboard shortcut "/" focuses search
+    document.addEventListener('keydown', function (e) {
+      if (e.key === '/' && document.activeElement !== input) {
+        e.preventDefault();
+        input.focus();
+        showRecentSuggestions();
+      }
+    });
+
+    // --- Full-content search: background fetch all linked files ---
+    function stripToText(raw, isHtml) {
+      if (isHtml) {
+        const div = document.createElement('div');
+        div.innerHTML = raw.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<style[\s\S]*?<\/style>/gi, '');
+        return (div.textContent || '').replace(/\s+/g, ' ').trim();
+      }
+      return raw
+        .replace(/```[\s\S]*?```/g, ' ')
+        .replace(/`[^`]+`/g, ' ')
+        .replace(/^#{1,6}\s+/gm, '')
+        .replace(/[*_~>|]/g, ' ')
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+        .replace(/!\[[^\]]*\]\([^)]+\)/g, ' ')
+        .replace(/\s+/g, ' ').trim();
+    }
+
+    const statusEl = document.createElement('span');
+    statusEl.id = 'content-index-status';
+    statusEl.textContent = '⏳ Đang tải nội dung...';
+    document.querySelector('.search-bar').appendChild(statusEl);
+
+    async function loadFileContents() {
+      const tasks = searchIndex.map(entry => async () => {
+        const href = entry.card.querySelector('a.btn-open')?.getAttribute('href') || '';
+        const isMd = href.endsWith('.md');
+        const isHtml = href.endsWith('.html');
+        if (!isMd && !isHtml) return;
+        try {
+          const res = await fetch(href);
+          if (!res.ok) return;
+          const text = stripToText(await res.text(), isHtml);
+          entry.haystack += ' ' + normalize(text);
+        } catch { /* skip on error */ }
+      });
+
+      const BATCH = 5;
+      for (let i = 0; i < tasks.length; i += BATCH) {
+        await Promise.all(tasks.slice(i, i + BATCH).map(fn => fn()));
+      }
+
+      statusEl.textContent = '✓ Tìm trong nội dung file';
+      statusEl.className = 'content-indexed';
+      setTimeout(() => {
+        statusEl.style.opacity = '0';
+        setTimeout(() => { statusEl.style.display = 'none'; }, 500);
+      }, 3000);
+
+      if (input.value.trim()) filter(input.value);
+    }
+
+    // --- Stat filter clicks ---
+    document.querySelectorAll('.stat[data-filter]').forEach(stat => {
+      stat.addEventListener('click', function () {
+        const f = this.dataset.filter;
+        if (f === 'all' || statusFilter === f) {
+          statusFilter = null;
+          document.querySelectorAll('.stat[data-filter]').forEach(s => s.classList.remove('stat-active'));
+        } else {
+          statusFilter = f;
+          document.querySelectorAll('.stat[data-filter]').forEach(s => s.classList.remove('stat-active'));
+          this.classList.add('stat-active');
+        }
+        input.value = '';
+        clearHighlights();
+        hideSuggestions();
+        filter('');
+      });
+    });
+
+    loadFileContents();
   })();
 </script>
 
