@@ -38,8 +38,14 @@ jobs:
               [ -f "${dir}package.json" ] && (cd "${dir}" && pnpm install --no-frozen-lockfile)
             done
 
+            # One-time cleanup: an earlier deploy ran the ecosystem file as a plain
+            # script (wrong extension) and left a junk process named after the file.
+            pm2 delete pm2-ecosystem-config-inet-mvp-demo-all-services 2>/dev/null || true
+
             # Zero-downtime reload if processes are already running, otherwise start
-            # them. `pm2 startOrReload` does not parse ecosystem .cjs files (expects a
-            # JSON dump), so use reload with a start fallback for a fresh server.
-            pm2 reload pm2-ecosystem-config-inet-mvp-demo-all-services.cjs --update-env \
-              || pm2 start pm2-ecosystem-config-inet-mvp-demo-all-services.cjs --update-env
+            # them. The ecosystem file ends in .config.cjs so PM2 parses its `apps`
+            # array (reload matches existing processes by name; start boots a fresh
+            # server). `pm2 startOrReload` is avoided — it expects a JSON dump.
+            pm2 reload pm2-ecosystem-inet-mvp-demo-all-services.config.cjs --update-env \
+              || pm2 start pm2-ecosystem-inet-mvp-demo-all-services.config.cjs --update-env
+            pm2 save

@@ -136,9 +136,9 @@ echo ""
 echo "=== [7/9] PM2 start ==="
 cd "$DEPLOY_DIR"
 if pm2 list | grep -q "hub"; then
-  pm2 reload pm2-ecosystem-config-inet-mvp-demo-all-services.cjs --update-env
+  pm2 reload pm2-ecosystem-inet-mvp-demo-all-services.config.cjs --update-env
 else
-  pm2 start pm2-ecosystem-config-inet-mvp-demo-all-services.cjs
+  pm2 start pm2-ecosystem-inet-mvp-demo-all-services.config.cjs
 fi
 pm2 save
 

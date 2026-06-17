@@ -1,6 +1,8 @@
-// PM2 ecosystem — chạy từ ~/friday-products/
-// pm2 start ecosystem.config.cjs
-// pm2 reload ecosystem.config.cjs --update-env
+// PM2 ecosystem — chạy từ ~/inet-mvp-demo/
+// Tên file PHẢI kết thúc bằng .config.cjs để PM2 nhận diện là ecosystem config
+// (nếu không, PM2 chạy file như script thường thay vì đọc mảng `apps`).
+// pm2 start pm2-ecosystem-inet-mvp-demo-all-services.config.cjs
+// pm2 reload pm2-ecosystem-inet-mvp-demo-all-services.config.cjs --update-env
 
 module.exports = {
   apps: [
