@@ -37,7 +37,13 @@ Không bắt buộc. Có thể override port qua `PORT` (mặc định `9043`).
 
 ## Demo
 
-Domain demo (`expired.badssl.com`, `self-signed.badssl.com`) được override cứng trong server → kịch bản cert hết hạn / self-signed nhất quán khi present.
+Toàn bộ kết quả lấy từ cert thật (không mock, không override). Các domain `badssl.com` phục vụ sẵn cert thật cho từng kịch bản, dùng trực tiếp khi present:
+
+| Domain | Kịch bản (real cert) |
+|--------|----------------------|
+| `expired.badssl.com` | Cert hết hạn → `status: expired`, score `0`, grade `F` |
+| `self-signed.badssl.com` | Cert self-signed → `selfSigned: true` (phát hiện qua fingerprint issuer chain), `status: self_signed`, score `40`, grade `D` |
+| `inet.vn` | Cert hợp lệ → score theo số ngày còn lại |
 
 ## Liên kết
 

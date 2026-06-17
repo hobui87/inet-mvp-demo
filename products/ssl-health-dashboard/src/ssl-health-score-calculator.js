@@ -1,11 +1,11 @@
 // Calculates SSL health score (0-100) and grade (A/B/C/D/F) based on certificate daysRemaining and validity
 
 /**
- * @param {{ daysRemaining: number, valid: boolean, error?: string }} certInfo
+ * @param {{ daysRemaining: number, valid: boolean, selfSigned?: boolean, error?: string }} certInfo
  * @returns {{ score: number, grade: string, status: string }}
  */
 export function calculateSslHealthScore(certInfo) {
-  const { daysRemaining, valid, error } = certInfo
+  const { daysRemaining, valid, selfSigned, error } = certInfo
 
   let score = 0
   let status = 'error'
@@ -16,6 +16,10 @@ export function calculateSslHealthScore(certInfo) {
   } else if (!valid || daysRemaining <= 0) {
     score = 0
     status = 'expired'
+  } else if (selfSigned) {
+    // Untrusted: not expired, but not a CA-issued production cert
+    score = 40
+    status = 'self_signed'
   } else if (daysRemaining <= 7) {
     score = 20
     status = 'critical'

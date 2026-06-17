@@ -8,30 +8,6 @@ import { calculateSslHealthScore } from './src/ssl-health-score-calculator.js'
 const PORT = Number(process.env.PORT) || 9043
 const MAX_DOMAINS = 10
 
-// Demo overrides — hardcoded for known test domains (badssl.com scenarios)
-const DEMO_OVERRIDES = {
-  'expired.badssl.com': {
-    daysRemaining: -5,
-    valid: false,
-    selfSigned: false,
-    issuer: 'BadSSL',
-    subject: 'expired.badssl.com',
-    validFrom: '2015-04-09',
-    validTo: '2015-04-10',
-    protocol: 'TLS 1.2',
-  },
-  'self-signed.badssl.com': {
-    daysRemaining: 3650,
-    valid: false,
-    selfSigned: true,
-    issuer: 'self-signed.badssl.com',
-    subject: 'self-signed.badssl.com',
-    validFrom: new Date(Date.now() - 86400000).toISOString().split('T')[0],
-    validTo: new Date(Date.now() + 3650 * 86400000).toISOString().split('T')[0],
-    protocol: 'TLS 1.2',
-  },
-}
-
 const app = new Hono()
 
 app.get('/api/health', (c) => c.json({ ok: true, port: PORT }))
@@ -61,11 +37,7 @@ app.post('/api/check', async (c) => {
 
   const results = await Promise.all(
     domains.map(async (domain) => {
-      const override = DEMO_OVERRIDES[domain]
-      const certInfo = override
-        ? { domain, ...override }
-        : await fetchSslCertInfo(domain)
-
+      const certInfo = await fetchSslCertInfo(domain)
       const { score, grade, status } = calculateSslHealthScore(certInfo)
       return { ...certInfo, score, grade, status }
     })
