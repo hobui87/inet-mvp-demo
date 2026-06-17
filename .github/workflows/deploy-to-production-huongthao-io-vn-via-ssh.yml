@@ -38,5 +38,7 @@ jobs:
               [ -f "${dir}package.json" ] && (cd "${dir}" && pnpm install --no-frozen-lockfile)
             done
 
-            # Zero-downtime reload all PM2 processes
-            pm2 reload pm2-ecosystem-config-inet-mvp-demo-all-services.cjs --update-env
+            # Start on first deploy, otherwise zero-downtime reload all PM2 processes.
+            # `reload` alone fails if the processes are not yet running (fresh server
+            # or after `pm2 kill`); `startOrReload` is idempotent.
+            pm2 startOrReload pm2-ecosystem-config-inet-mvp-demo-all-services.cjs --update-env
