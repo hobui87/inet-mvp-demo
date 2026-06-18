@@ -8,7 +8,6 @@ import { checkDkimSelectors } from './src/dns-dkim-selector-public-key-checker.j
 import { checkDmarcRecord } from './src/dns-dmarc-policy-record-checker.js';
 import { calculateEmailAuthScore } from './src/email-auth-score-and-grade-calculator.js';
 import { generateRemediationGuide } from './src/vietnamese-email-auth-remediation-guide-generator.js';
-import { DEMO_OVERRIDES } from './src/demo-domain-overrides-for-friday-presentation.js';
 
 const app = new Hono();
 const PORT = Number(process.env.PORT) || 9042;
@@ -35,18 +34,12 @@ app.post('/api/check', async (c) => {
 
   const start = Date.now();
 
-  let spf, dkim, dmarc;
-
-  const override = DEMO_OVERRIDES[domain];
-  if (override) {
-    ({ spf, dkim, dmarc } = override);
-  } else {
-    [spf, dkim, dmarc] = await Promise.all([
-      checkSpfRecord(domain),
-      checkDkimSelectors(domain),
-      checkDmarcRecord(domain),
-    ]);
-  }
+  // Luôn query DNS thật — không còn override demo
+  const [spf, dkim, dmarc] = await Promise.all([
+    checkSpfRecord(domain),
+    checkDkimSelectors(domain),
+    checkDmarcRecord(domain),
+  ]);
 
   const { score, grade, grade_label, summary, spf_score, dkim_score, dmarc_score } =
     calculateEmailAuthScore({ spf, dkim, dmarc });

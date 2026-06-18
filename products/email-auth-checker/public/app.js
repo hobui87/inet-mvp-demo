@@ -413,16 +413,6 @@ btnShare.addEventListener('click', async () => {
   }
 });
 
-// Demo chips
-document.querySelectorAll('.chip[data-domain]').forEach(chip => {
-  chip.addEventListener('click', () => {
-    input.value = chip.dataset.domain;
-    resetInputError();
-    btnInputClear.hidden = false;
-    check(chip.dataset.domain);
-  });
-});
-
 // ── Init: auto-scan from ?domain= query param ─────────────
 (function init() {
   const domain = new URLSearchParams(location.search).get('domain');

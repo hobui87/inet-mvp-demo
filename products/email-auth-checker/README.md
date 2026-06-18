@@ -35,9 +35,9 @@ Mở browser: `http://localhost:9042`
 
 Không bắt buộc. Có thể override port qua `PORT` (mặc định `9042`).
 
-## Demo
+## Dữ liệu
 
-Domain demo được override cứng trong `src/demo-domain-overrides-for-friday-presentation.js` → kết quả nhất quán khi present, không phụ thuộc DNS thật.
+Tool query DNS **thật** cho mọi domain (SPF/DKIM/DMARC) — không còn override demo. Kết quả phản ánh đúng cấu hình hiện tại của domain tại thời điểm kiểm tra.
 
 ## Liên kết
 

@@ -53,25 +53,6 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', system-u
 /* ── Search section ──────────────────────────────────────── */
 .search-section { margin: 32px 0 8px; }
 
-.preset-chips {
-  display: flex; align-items: center; gap: 8px;
-  flex-wrap: wrap; margin-bottom: 14px;
-}
-.chips-label { font-size: 12px; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
-.chip {
-  display: inline-flex; align-items: center; gap: 4px;
-  background: var(--surface); border: 1px solid var(--border);
-  color: var(--text); border-radius: 20px; padding: 5px 14px;
-  font-size: 12px; font-weight: 500; cursor: pointer;
-  font-family: inherit; transition: background var(--transition), border-color var(--transition);
-  white-space: nowrap;
-}
-.chip:hover { background: var(--surface-2); border-color: var(--navy); }
-.chip:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
-.chip-pass::before    { content: "●"; color: var(--green);  margin-right: 3px; font-size: 8px; }
-.chip-partial::before { content: "●"; color: var(--yellow); margin-right: 3px; font-size: 8px; }
-.chip-fail::before    { content: "●"; color: var(--red);    margin-right: 3px; font-size: 8px; }
-
 .scan-form { display: flex; flex-direction: column; gap: 8px; }
 .input-group {
   display: flex; border-radius: var(--radius); overflow: hidden;
@@ -372,5 +353,5 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', system-u
 @media (prefers-reduced-motion: reduce) {
   .skeleton { animation: none; background: var(--surface-2); }
   .circle-progress { transition: none; }
-  .auth-card, .btn-check, .btn-rescan, .chip { transition: none; }
+  .auth-card, .btn-check, .btn-rescan { transition: none; }
 }
