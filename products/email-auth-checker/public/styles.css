@@ -181,9 +181,10 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', system-u
   transition: transform var(--transition), box-shadow var(--transition);
 }
 .auth-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
-.auth-card.status-ok    { border-color: rgba(22,163,74,0.35);  background: rgba(22,163,74,0.05); }
-.auth-card.status-warn  { border-color: rgba(217,119,6,0.35);  background: rgba(217,119,6,0.05); }
-.auth-card.status-error { border-color: rgba(220,38,38,0.35);  background: rgba(220,38,38,0.05); }
+.auth-card.status-ok      { border-color: rgba(22,163,74,0.35);  background: rgba(22,163,74,0.05); }
+.auth-card.status-warn    { border-color: rgba(217,119,6,0.35);  background: rgba(217,119,6,0.05); }
+.auth-card.status-error   { border-color: rgba(220,38,38,0.35);  background: rgba(220,38,38,0.05); }
+.auth-card.status-neutral { border-color: rgba(148,163,184,0.35); background: rgba(148,163,184,0.06); }
 
 .auth-card-header { display: flex; align-items: center; gap: 10px; }
 .auth-card-icon { font-size: 20px; line-height: 1; flex-shrink: 0; }
@@ -192,10 +193,30 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', system-u
   font-size: 12px; font-weight: 500; margin-top: 2px;
   padding: 2px 8px; border-radius: 99px; width: fit-content;
 }
-.auth-card.status-ok    .auth-card-status { color: var(--green);  background: rgba(22,163,74,0.15); }
-.auth-card.status-warn  .auth-card-status { color: var(--yellow); background: rgba(217,119,6,0.15); }
-.auth-card.status-error .auth-card-status { color: var(--red);    background: rgba(220,38,38,0.15); }
+.auth-card.status-ok      .auth-card-status { color: var(--green);  background: rgba(22,163,74,0.15); }
+.auth-card.status-warn    .auth-card-status { color: var(--yellow); background: rgba(217,119,6,0.15); }
+.auth-card.status-error   .auth-card-status { color: var(--red);    background: rgba(220,38,38,0.15); }
+.auth-card.status-neutral .auth-card-status { color: var(--muted);  background: rgba(148,163,184,0.15); }
 .auth-card-detail { font-size: 11px; color: var(--muted); line-height: 1.5; word-break: break-all; }
+
+/* Advanced options (nhập DKIM selector thủ công) */
+.advanced-options { margin-top: 12px; font-size: 13px; }
+.advanced-summary {
+  cursor: pointer; color: var(--muted); font-weight: 500; padding: 6px 0;
+  user-select: none; transition: color var(--transition);
+}
+.advanced-summary:hover { color: var(--text); }
+.advanced-body { display: flex; flex-direction: column; gap: 8px; padding: 10px 0 4px; }
+.advanced-hint { font-size: 12px; color: var(--muted); line-height: 1.5; margin: 0; }
+.advanced-hint code { background: rgba(148,163,184,0.15); padding: 1px 5px; border-radius: 4px; }
+.advanced-label { font-size: 11px; font-weight: 600; color: var(--text); margin-top: 4px; }
+.advanced-input, .advanced-textarea {
+  width: 100%; padding: 8px 10px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--bg); color: var(--text);
+  font-family: inherit; font-size: 13px; box-sizing: border-box;
+}
+.advanced-textarea { resize: vertical; font-family: ui-monospace, monospace; }
+.advanced-input:focus, .advanced-textarea:focus { outline: none; border-color: var(--accent, #024799); }
 
 /* Score breakdown bar */
 .breakdown-section { margin-bottom: 28px; }

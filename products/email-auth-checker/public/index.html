@@ -68,6 +68,31 @@
         </button>
       </div>
       <p id="input-error" class="input-error" role="alert" aria-live="polite"></p>
+
+      <details class="advanced-options" id="advanced-options">
+        <summary class="advanced-summary">Nâng cao — nhập DKIM selector thủ công</summary>
+        <div class="advanced-body">
+          <p class="advanced-hint">Domain dùng dịch vụ như Amazon SES, Brevo, Mailchimp có selector ngẫu nhiên không dò tự động được. Nhập selector hoặc dán header <code>DKIM-Signature</code> để kiểm tra chính xác.</p>
+          <label for="dkim-selector-input" class="advanced-label">DKIM selector</label>
+          <input
+            id="dkim-selector-input"
+            type="text"
+            class="advanced-input"
+            placeholder="vd: google, selector1, scph0…"
+            autocomplete="off"
+            autocapitalize="none"
+            spellcheck="false"
+          />
+          <label for="dkim-header-input" class="advanced-label">Hoặc dán DKIM-Signature header</label>
+          <textarea
+            id="dkim-header-input"
+            class="advanced-textarea"
+            rows="3"
+            placeholder="DKIM-Signature: v=1; a=rsa-sha256; d=example.com; s=selector1; …"
+            spellcheck="false"
+          ></textarea>
+        </div>
+      </details>
     </form>
   </section>
 

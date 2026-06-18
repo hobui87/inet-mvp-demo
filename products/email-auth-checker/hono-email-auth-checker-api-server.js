@@ -8,9 +8,35 @@ import { checkDkimSelectors } from './src/dns-dkim-selector-public-key-checker.j
 import { checkDmarcRecord } from './src/dns-dmarc-policy-record-checker.js';
 import { calculateEmailAuthScore } from './src/email-auth-score-and-grade-calculator.js';
 import { generateRemediationGuide } from './src/vietnamese-email-auth-remediation-guide-generator.js';
+import { parseDkimHeader } from './src/dkim-signature-header-parser.js';
 
 const app = new Hono();
 const PORT = Number(process.env.PORT) || 9042;
+const SELECTOR_CHARSET = /^[a-z0-9._-]{1,128}$/i;
+
+/**
+ * Xác định selector override + cảnh báo từ body. Ưu tiên selector tay > parse dkim_header.
+ * @returns {{ selector: string|null, warning: string|null }}
+ */
+function resolveDkimOverride(body, domain) {
+  // 1) selector nhập tay (early-reject chuỗi quá dài trước khi xử lý)
+  if (typeof body?.selector === 'string' && body.selector.length <= 256
+      && SELECTOR_CHARSET.test(body.selector.trim())) {
+    return { selector: body.selector.trim(), warning: null };
+  }
+  // 2) parse từ DKIM-Signature header (giới hạn 8KB ở tầng API, defense-in-depth với parser 4KB)
+  if (typeof body?.dkim_header === 'string' && body.dkim_header.length > 0
+      && body.dkim_header.length <= 8192) {
+    const parsed = parseDkimHeader(body.dkim_header);
+    if (parsed?.selector) {
+      const warning = parsed.domain && parsed.domain !== domain
+        ? `Header thuộc domain "${parsed.domain}" khác với domain đang kiểm tra "${domain}".`
+        : null;
+      return { selector: parsed.selector, warning };
+    }
+  }
+  return { selector: null, warning: null };
+}
 
 // ── Health check ─────────────────────────────────────────
 app.get('/api/health', (c) => c.json({ ok: true, port: PORT }));
@@ -34,12 +60,16 @@ app.post('/api/check', async (c) => {
 
   const start = Date.now();
 
+  // Selector override tùy chọn (nhập tay / từ DKIM-Signature header) — backward compatible
+  const { selector: dkimSelector, warning: dkimWarning } = resolveDkimOverride(body, domain);
+
   // Luôn query DNS thật — không còn override demo
   const [spf, dkim, dmarc] = await Promise.all([
     checkSpfRecord(domain),
-    checkDkimSelectors(domain),
+    checkDkimSelectors(domain, dkimSelector ? { selector: dkimSelector } : {}),
     checkDmarcRecord(domain),
   ]);
+  if (dkimWarning) dkim.warning = dkimWarning;
 
   const { score, grade, grade_label, summary, spf_score, dkim_score, dmarc_score } =
     calculateEmailAuthScore({ spf, dkim, dmarc });

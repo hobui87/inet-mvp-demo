@@ -12,6 +12,7 @@ const STATUS_ICONS = {
   warn:    '⚠️',
   warning: '⚠️',
   error:   '❌',
+  neutral: '❔',
 };
 
 // backend emits 'warning'; CSS uses 'warn' — normalize for class names
@@ -53,6 +54,9 @@ const summaryText   = document.getElementById('summary-text');
 const authCards     = document.getElementById('auth-cards');
 const fixGuideList  = document.getElementById('fix-guide-list');
 const a11yAnnounce  = document.getElementById('a11y-announce');
+const advancedOptions   = document.getElementById('advanced-options');
+const dkimSelectorInput = document.getElementById('dkim-selector-input');
+const dkimHeaderInput   = document.getElementById('dkim-header-input');
 
 // ── State ─────────────────────────────────────────────────
 let state = { status: 'idle', domain: '', result: null };
@@ -118,9 +122,47 @@ function renderSummary(data) {
   summaryText.textContent = data.summary;
 }
 
+// ── Build DKIM card (4-state: ok / warn / error / neutral) ──
+function _buildDkimCard(dkim) {
+  const status = dkim.status ?? (dkim.exists ? 'found' : 'inconclusive');
+  const keyInfo = [
+    dkim.key_type ? dkim.key_type.toUpperCase() : null,
+    typeof dkim.key_bits === 'number' ? `${dkim.key_bits}-bit` : null,
+  ].filter(Boolean).join(' ');
+  const extraWarnings = [...(dkim.warnings ?? [])];
+  if (dkim.warning) extraWarnings.push(dkim.warning); // d= mismatch từ header
+
+  let cardStatus, statusText, detail;
+  if (status === 'found') {
+    cardStatus = dkim.revoked ? 'error'
+      : (dkim.test_mode || (dkim.key_type === 'rsa' && typeof dkim.key_bits === 'number' && dkim.key_bits < 2048)) ? 'warn'
+      : 'ok';
+    statusText = dkim.revoked ? 'Key đã bị thu hồi'
+      : `Tìm thấy: ${dkim.selectors_found.join(', ')}`;
+    detail = [
+      `Public key: ${dkim.public_key_snippet ?? '(có)'}${keyInfo ? ` · ${keyInfo}` : ''}`,
+      ...extraWarnings,
+    ].join(' · ');
+  } else if (status === 'absent') {
+    cardStatus = 'error';
+    statusText = 'Không tìm thấy (đã xác nhận)';
+    detail = `Selector "${dkim.selectors_checked.join(', ')}" không tồn tại cho domain này.`;
+  } else { // inconclusive
+    cardStatus = 'neutral';
+    statusText = 'Chưa xác định được';
+    detail = `Đã thử ${dkim.selectors_checked.length} selector phổ biến, không tìm thấy. Domain có thể dùng selector riêng — nhập selector hoặc dán DKIM-Signature header ở mục "Nâng cao" để kiểm tra chính xác.`;
+  }
+
+  return { id: 'dkim', name: 'DKIM', desc: 'DomainKeys Identified Mail', status: cardStatus, statusText, detail };
+}
+
 // ── Render auth cards (SPF / DKIM / DMARC) ───────────────
 function renderAuthCards(data) {
   authCards.innerHTML = '';
+
+  // Khi DKIM chưa xác định → mở sẵn "Nâng cao" để user nhập selector
+  const dkimStatus = data.dkim.status ?? (data.dkim.exists ? 'found' : 'inconclusive');
+  if (dkimStatus === 'inconclusive' && advancedOptions) advancedOptions.open = true;
 
   const cards = [
     {
@@ -138,33 +180,27 @@ function renderAuthCards(data) {
         ? data.spf.record.slice(0, 80) + (data.spf.record.length > 80 ? '…' : '')
         : 'Không tìm thấy TXT record v=spf1',
     },
-    {
-      id: 'dkim',
-      name: 'DKIM',
-      desc: 'DomainKeys Identified Mail',
-      status: data.dkim.exists ? 'ok' : 'error',
-      statusText: data.dkim.exists
-        ? `Tìm thấy selector: ${data.dkim.selectors_found.join(', ')}`
-        : 'Không tìm thấy selector',
-      detail: data.dkim.exists
-        ? `Public key: ${data.dkim.public_key_snippet ?? '(có)'}`
-        : `Đã thử 8 selectors: ${data.dkim.selectors_checked.join(', ')}`,
-    },
+    _buildDkimCard(data.dkim),
     {
       id: 'dmarc',
       name: 'DMARC',
       desc: 'Message Authentication Reporting',
       status: !data.dmarc.exists ? 'error'
+        : data.dmarc.record_count > 1 || data.dmarc.pct_nonsense ? 'warn'
         : data.dmarc.policy === 'reject' ? 'ok'
         : data.dmarc.policy === 'quarantine' ? 'warn'
         : 'warn',
       statusText: !data.dmarc.exists ? 'Chưa có record'
+        : data.dmarc.record_count > 1 ? `${data.dmarc.record_count} bản ghi (lỗi)`
         : data.dmarc.policy === 'reject' ? 'Reject ✓'
         : data.dmarc.policy === 'quarantine' ? 'Quarantine'
         : 'None (chỉ theo dõi)',
-      detail: data.dmarc.record
-        ? data.dmarc.record.slice(0, 80) + (data.dmarc.record.length > 80 ? '…' : '')
-        : 'Không tìm thấy TXT record _dmarc',
+      detail: !data.dmarc.exists
+        ? 'Không tìm thấy TXT record _dmarc'
+        : [
+            data.dmarc.record.slice(0, 80) + (data.dmarc.record.length > 80 ? '…' : ''),
+            ...(data.dmarc.warnings ?? []),
+          ].join(' · '),
     },
   ];
 
@@ -331,10 +367,16 @@ async function check(domain) {
   showLoading();
 
   try {
+    const payload = { domain };
+    const selector = dkimSelectorInput?.value.trim();
+    const dkimHeader = dkimHeaderInput?.value.trim();
+    if (selector) payload.selector = selector;
+    else if (dkimHeader) payload.dkim_header = dkimHeader;
+
     const res  = await fetch('./api/check', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ domain }),
+      body: JSON.stringify(payload),
     });
     const data = await res.json();
 

@@ -1,0 +1,18 @@
+{
+  "_note": "Danh sách DKIM selector đã kiểm chứng, cập nhật review hàng quý. SES/Brevo/Mailchimp dùng token selector ngẫu nhiên -> KHÔNG brute-force được (xem phase 02 nhập tay).",
+  "generic": ["default", "dkim", "mail", "email", "smtp", "selector1", "selector2", "s1", "s2", "k1", "k2", "k3"],
+  "providers": {
+    "google": ["google", "google2"],
+    "microsoft": ["selector1", "selector2"],
+    "sendgrid": ["s1", "s2"],
+    "mailgun": ["k1", "k2", "k3", "mg", "smtp"],
+    "zoho": ["zoho", "zmail"],
+    "postmark": ["pm", "pm1"],
+    "sparkpost": ["scph0", "scph1"],
+    "mandrill": ["mandrill", "mte1", "mte2"],
+    "protonmail": ["protonmail", "protonmail2", "protonmail3"],
+    "fastmail": ["fm1", "fm2", "fm3"],
+    "yahoo": ["s2048", "s1024"],
+    "zendesk": ["zendesk1", "zendesk2"]
+  }
+}

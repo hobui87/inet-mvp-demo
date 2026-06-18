@@ -11,6 +11,9 @@ import dns from 'node:dns/promises';
  * @property {string|null} ruf - Reporting URI Forensic
  * @property {'r'|'s'|null} adkim - DKIM alignment mode
  * @property {'r'|'s'|null} aspf - SPF alignment mode
+ * @property {number} record_count - Số TXT v=DMARC1 tại _dmarc (>1 là lỗi)
+ * @property {boolean} pct_nonsense - pct=0 nhưng policy khác none (vô nghĩa)
+ * @property {string[]} warnings - Cảnh báo tiếng Việt về chất lượng record
  * @property {string|null} error
  */
 
@@ -30,12 +33,23 @@ export async function checkDmarcRecord(domain) {
     }
 
     const record = flat[0];
+    const record_count = flat.length;
     const tags = _parseTags(record);
 
     const policy = ['none', 'quarantine', 'reject'].includes(tags.p) ? tags.p : null;
-    const pct = tags.pct !== undefined ? Math.min(100, Math.max(0, parseInt(tags.pct, 10) || 100)) : 100;
+    const pctRaw = tags.pct !== undefined ? parseInt(tags.pct, 10) : 100;
+    const pct = Math.min(100, Math.max(0, Number.isNaN(pctRaw) ? 100 : pctRaw));
     const adkim = tags.adkim === 's' ? 's' : (tags.adkim === 'r' ? 'r' : null);
     const aspf  = tags.aspf  === 's' ? 's' : (tags.aspf  === 'r' ? 'r' : null);
+
+    const pct_nonsense = pct === 0 && policy !== null && policy !== 'none';
+    const warnings = [];
+    if (record_count > 1) {
+      warnings.push(`Có ${record_count} bản ghi DMARC tại _dmarc — RFC yêu cầu CHỈ 1; nhiều bản ghi khiến DMARC bị bỏ qua hoàn toàn.`);
+    }
+    if (pct_nonsense) {
+      warnings.push('pct=0 nhưng policy khác none — không có email nào thực sự bị áp policy (cấu hình vô nghĩa).');
+    }
 
     return {
       exists: true,
@@ -46,6 +60,9 @@ export async function checkDmarcRecord(domain) {
       ruf: tags.ruf ?? null,
       adkim,
       aspf,
+      record_count,
+      pct_nonsense,
+      warnings,
       error: null,
     };
   } catch (err) {
@@ -67,5 +84,8 @@ function _parseTags(record) {
 }
 
 function _empty(error) {
-  return { exists: false, record: null, policy: null, pct: 100, rua: null, ruf: null, adkim: null, aspf: null, error };
+  return {
+    exists: false, record: null, policy: null, pct: 100, rua: null, ruf: null,
+    adkim: null, aspf: null, record_count: 0, pct_nonsense: false, warnings: [], error,
+  };
 }
