@@ -42,10 +42,23 @@ jobs:
             # script (wrong extension) and left a junk process named after the file.
             pm2 delete pm2-ecosystem-config-inet-mvp-demo-all-services 2>/dev/null || true
 
-            # Zero-downtime reload if processes are already running, otherwise start
-            # them. The ecosystem file ends in .config.cjs so PM2 parses its `apps`
-            # array (reload matches existing processes by name; start boots a fresh
-            # server). `pm2 startOrReload` is avoided — it expects a JSON dump.
-            pm2 reload pm2-ecosystem-inet-mvp-demo-all-services.config.cjs --update-env \
-              || pm2 start pm2-ecosystem-inet-mvp-demo-all-services.config.cjs --update-env
+            # Diagnostics — confirm what code is on disk and what PM2 is running.
+            echo "=== git HEAD on server ==="
+            git log -1 --oneline
+            echo "=== DEMO_OVERRIDE still in deployed file? (expect 0) ==="
+            grep -c "DEMO_OVERRIDE" products/email-auth-checker/hono-email-auth-checker-api-server.js || echo 0
+            echo "=== pm2 list BEFORE ==="
+            pm2 list
+
+            # `pm2 reload` was observed to keep serving STALE code (false-success):
+            # it gracefully reloaded the named processes but they continued running the
+            # previous build, so removed demo-override code stayed live. Delete the
+            # ecosystem's apps then start fresh to GUARANTEE the new build is loaded.
+            # Brief restart downtime is acceptable for this demo server; reliability
+            # matters more than zero-downtime here.
+            pm2 delete pm2-ecosystem-inet-mvp-demo-all-services.config.cjs 2>/dev/null || true
+            pm2 start pm2-ecosystem-inet-mvp-demo-all-services.config.cjs --update-env
             pm2 save
+
+            echo "=== pm2 list AFTER ==="
+            pm2 list
