@@ -63,10 +63,14 @@ jobs:
             # (holding the ports with stale code) survived every prior deploy.
             pm2 delete hub domain-reputation email-auth-checker ssl-health-dashboard ip-reputation-checker 2>/dev/null || true
 
-            # Free the product ports by killing WHOEVER holds them (kill by PORT, not by
-            # process name: an orphan launched from an older filename would be missed, and
-            # `pkill -f <name>` also matches this deploy shell). Try every tool available.
-            for p in 9041 9042 9043 9044; do
+            # Free the HUB port (9030) AND the product ports by killing WHOEVER holds them
+            # (kill by PORT, not by process name: an orphan launched from an older filename
+            # would be missed, and `pkill -f <name>` also matches this deploy shell).
+            # ROOT CAUSE (found 2026-06-19): the hub's own port 9030 was missing from this
+            # list, so an orphaned OLD hub kept holding 9030 and answered with stale code
+            # that lacked newly-added product routes (e.g. /product/ip-reputation → 404
+            # "not registered"), while the fresh pm2 hub crash-looped on EADDRINUSE.
+            for p in 9030 9041 9042 9043 9044; do
               command -v fuser >/dev/null 2>&1 && fuser -k "${p}/tcp" 2>/dev/null || true
               command -v lsof  >/dev/null 2>&1 && kill -9 $(lsof -ti "tcp:${p}" 2>/dev/null) 2>/dev/null || true
               command -v ss    >/dev/null 2>&1 && kill -9 $(ss -ltnpH "sport = :${p}" 2>/dev/null | grep -oP 'pid=\K[0-9]+') 2>/dev/null || true
@@ -85,3 +89,8 @@ jobs:
             (command -v lsof >/dev/null 2>&1 && lsof -i:9043 -sTCP:LISTEN -P -n) || (command -v ss >/dev/null 2>&1 && ss -ltnp "sport = :9043") || echo "no lsof/ss"
             echo "=== ssl-health real-data check (expect keyType present) ==="
             curl -s --max-time 15 -X POST http://localhost:9043/api/check -H "Content-Type: application/json" -d '{"domains":["inet.vn"]}' | grep -o '"keyType"' && echo "OK: new code serving" || (echo "FAIL: old code still answering"; pm2 logs ssl-health-dashboard --lines 25 --nostream 2>&1 || true)
+
+            # Verify the HUB on 9030 is the fresh build: it must know the ip-reputation
+            # route. A stale orphan hub answers "not registered" (the bug fixed above).
+            echo "=== hub route check: /product/ip-reputation/api/health via hub :9030 ==="
+            curl -s --max-time 15 http://localhost:9030/product/ip-reputation/api/health | grep -o '"ok":true' && echo "OK: hub serves ip-reputation" || (echo "FAIL: hub stale / ip-reputation not registered"; pm2 logs hub --lines 25 --nostream 2>&1 || true)
