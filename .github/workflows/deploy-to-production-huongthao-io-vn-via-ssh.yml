@@ -54,13 +54,17 @@ jobs:
             # RAW node processes OUTSIDE pm2, holding the product ports. The pm2-managed
             # copies then crash-looped on EADDRINUSE (errored, 60+ restarts) while the
             # stale raw process kept answering with old code — so `pm2 reload`/`start`
-            # never took effect. Delete the pm2 entries, KILL any orphaned product
-            # servers by script name to free the ports, then start fresh.
+            # never took effect. Delete the pm2 entries, free the product ports by
+            # killing WHOEVER holds them (kill by PORT, not by process name: the orphan
+            # was launched from an older filename, and `pkill -f <name>` also matched
+            # this deploy shell and SIGTERM-ed it), then start fresh.
             pm2 delete pm2-ecosystem-inet-mvp-demo-all-services.config.cjs 2>/dev/null || true
-            for s in hono-domain-reputation-api-server hono-email-auth-checker-api-server \
-                     hono-ssl-health-dashboard-api-server hono-ip-reputation-api-server \
-                     friday-demo-hub-server-plans-static-and-product-proxy; do
-              pkill -f "$s" 2>/dev/null || true
+            for p in 9041 9042 9043 9044; do
+              if command -v fuser >/dev/null 2>&1; then
+                fuser -k "${p}/tcp" 2>/dev/null || true
+              elif command -v lsof >/dev/null 2>&1; then
+                kill -9 $(lsof -ti "tcp:${p}") 2>/dev/null || true
+              fi
             done
             sleep 2
             pm2 start pm2-ecosystem-inet-mvp-demo-all-services.config.cjs --update-env
