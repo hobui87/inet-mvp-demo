@@ -50,13 +50,19 @@ jobs:
             echo "=== pm2 list BEFORE ==="
             pm2 list
 
-            # `pm2 reload` was observed to keep serving STALE code (false-success):
-            # it gracefully reloaded the named processes but they continued running the
-            # previous build, so removed demo-override code stayed live. Delete the
-            # ecosystem's apps then start fresh to GUARANTEE the new build is loaded.
-            # Brief restart downtime is acceptable for this demo server; reliability
-            # matters more than zero-downtime here.
+            # ROOT CAUSE (found 2026-06-19): old product servers were left running as
+            # RAW node processes OUTSIDE pm2, holding the product ports. The pm2-managed
+            # copies then crash-looped on EADDRINUSE (errored, 60+ restarts) while the
+            # stale raw process kept answering with old code — so `pm2 reload`/`start`
+            # never took effect. Delete the pm2 entries, KILL any orphaned product
+            # servers by script name to free the ports, then start fresh.
             pm2 delete pm2-ecosystem-inet-mvp-demo-all-services.config.cjs 2>/dev/null || true
+            for s in hono-domain-reputation-api-server hono-email-auth-checker-api-server \
+                     hono-ssl-health-dashboard-api-server hono-ip-reputation-api-server \
+                     friday-demo-hub-server-plans-static-and-product-proxy; do
+              pkill -f "$s" 2>/dev/null || true
+            done
+            sleep 2
             pm2 start pm2-ecosystem-inet-mvp-demo-all-services.config.cjs --update-env
             pm2 save
 
