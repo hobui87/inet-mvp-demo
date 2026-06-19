@@ -460,6 +460,14 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Serial numbers are long hex — monospace + ellipsis, full value on hover */
+.meta-serial {
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 11px;
 }
 
 .tag-self-signed {
@@ -482,6 +490,30 @@
   font-weight: 600;
   background: rgba(59,130,246,0.12);
   color: var(--blue);
+  border-radius: 4px;
+  padding: 1px 6px;
+  letter-spacing: 0.3px;
+}
+
+.tag-hsts-on {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(34,197,94,0.12);
+  color: var(--green);
+  border-radius: 4px;
+  padding: 1px 6px;
+  letter-spacing: 0.3px;
+}
+
+.tag-hsts-off {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(100,116,139,0.15);
+  color: var(--muted);
   border-radius: 4px;
   padding: 1px 6px;
   letter-spacing: 0.3px;

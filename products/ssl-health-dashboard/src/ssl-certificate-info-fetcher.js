@@ -1,5 +1,12 @@
 // Fetches SSL certificate details from a domain using node:https — returns cert validity, issuer, expiry, daysRemaining
 import https from 'node:https'
+import {
+  extractKeyInfo,
+  extractSanList,
+  extractChain,
+  extractCipher,
+  extractHsts,
+} from './ssl-certificate-detail-extractor.js'
 
 const TIMEOUT_MS = 8000
 // Transient network errors worth one automatic retry
@@ -44,6 +51,13 @@ function attemptFetchSslCertInfo(domain) {
           return
         }
 
+        // Deep real-data details from the cert + live socket/headers
+        const keyInfo = extractKeyInfo(cert)
+        const sanList = extractSanList(cert)
+        const chain   = extractChain(cert)
+        const cipher  = extractCipher(res.socket)
+        const hsts    = extractHsts(res.headers)
+
         const validTo   = new Date(cert.valid_to)
         const validFrom = new Date(cert.valid_from)
         const now       = new Date()
@@ -61,8 +75,8 @@ function attemptFetchSslCertInfo(domain) {
           ? cert.fingerprint256 === issuerFp
           : subjectCN === issuerCN && !issuerO
 
-        // TLS version from socket
-        const protocol = res.socket.getProtocol?.() ?? 'TLS'
+        // TLS version: prefer cipher's negotiated version, fall back to socket protocol
+        const protocol = cipher.tlsVersion ?? res.socket.getProtocol?.() ?? 'TLS'
 
         resolve({
           domain,
@@ -74,6 +88,17 @@ function attemptFetchSslCertInfo(domain) {
           validTo:        validTo.toISOString().split('T')[0],
           daysRemaining,
           protocol,
+          serialNumber:   cert.serialNumber ?? null,
+          keyType:        keyInfo.keyType,
+          keyStrength:    keyInfo.keyStrength,
+          keyBits:        keyInfo.keyBits,
+          sanList,
+          sanCount:       sanList.length,
+          chain,
+          chainDepth:     chain.length,
+          cipher:         cipher.cipher,
+          hsts:           hsts.hsts,
+          hstsMaxAge:     hsts.hstsMaxAge,
         })
       } catch (err) {
         resolve({ domain, valid: false, error: 'parse_error: ' + err.message })

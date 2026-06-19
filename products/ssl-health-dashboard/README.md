@@ -2,6 +2,21 @@
 
 Công cụ nội bộ kiểm tra sức khỏe chứng chỉ SSL/TLS của domain: ngày hết hạn, issuer, self-signed, protocol. Hỗ trợ quét hàng loạt (tối đa 10 domain) với score + grade.
 
+## Dữ liệu cert thật
+
+Mỗi domain được trích các trường lấy trực tiếp từ TLS handshake thật (`getPeerCertificate(true)` + socket/headers), không mock:
+
+| Trường | Nguồn real | Ví dụ |
+|--------|-----------|-------|
+| `keyType` + `keyStrength` | `cert.bits`/`cert.modulus` (RSA) · `cert.nistCurve` (EC) | `RSA 2048-bit`, `EC P-256` |
+| `sanList` + `sanCount` | `cert.subjectaltname` | `*.inet.vn`, `inet.vn` (2) |
+| `chain` + `chainDepth` | walk `cert.issuerCertificate` đến root | 4 cấp (leaf → USERTRUST) |
+| `serialNumber` | `cert.serialNumber` | `D6F4457C…` |
+| `cipher` | `socket.getCipher()` | `ECDHE-RSA-AES128-GCM-SHA256` |
+| `hsts` + `hstsMaxAge` | header `strict-transport-security` | `true`, `31536000` |
+
+RSA key < 2048-bit → score bị cap `60`, status `weak_key` (NIST SP 800-57).
+
 ## Tech Stack
 
 - **Backend**: Hono (Node.js), port `9043`

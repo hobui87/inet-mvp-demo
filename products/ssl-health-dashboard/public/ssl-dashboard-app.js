@@ -51,6 +51,7 @@ function getStatusLabel(status, selfSigned) {
     case 'valid':         return '✅ Hợp lệ'
     case 'expiring_soon': return '⚠️ Sắp hết hạn'
     case 'warning':       return '⚠️ Sắp hết hạn'
+    case 'weak_key':      return '⚠️ Key yếu'
     case 'critical':      return '🔴 Nguy hiểm'
     case 'expired':       return '🔴 Đã hết hạn'
     default:              return '❌ Lỗi'
@@ -62,7 +63,8 @@ function getBadgeClass(status, selfSigned) {
   switch (status) {
     case 'valid':         return 'badge-valid'
     case 'expiring_soon':
-    case 'warning':       return 'badge-warning'
+    case 'warning':
+    case 'weak_key':      return 'badge-warning'
     case 'critical':      return 'badge-critical'
     case 'expired':       return 'badge-expired'
     default:              return 'badge-error'
@@ -70,7 +72,7 @@ function getBadgeClass(status, selfSigned) {
 }
 
 function getCardClass(status, selfSigned) {
-  if (selfSigned || status === 'expiring_soon' || status === 'warning') return 'card-warning'
+  if (selfSigned || status === 'expiring_soon' || status === 'warning' || status === 'weak_key') return 'card-warning'
   switch (status) {
     case 'valid':    return 'card-valid'
     case 'critical':
@@ -94,7 +96,8 @@ function getProgressColor(status, selfSigned) {
   switch (status) {
     case 'valid':         return '#22c55e'
     case 'expiring_soon':
-    case 'warning':       return '#f59e0b'
+    case 'warning':
+    case 'weak_key':      return '#f59e0b'
     case 'critical':
     case 'expired':       return '#ef4444'
     default:              return '#64748b'
@@ -134,12 +137,56 @@ function renderCard(r) {
     ? `<span class="tag-protocol">${escHtml(r.protocol)}</span>`
     : ''
 
+  const keyText = r.keyType && r.keyType !== 'unknown'
+    ? `${escHtml(r.keyType)} ${escHtml(r.keyStrength || '')}`.trim()
+    : '—'
+
+  const sanText = r.sanCount
+    ? `${r.sanCount} domain${r.sanCount > 1 ? 's' : ''}`
+    : '—'
+
+  const sanTitle = Array.isArray(r.sanList) && r.sanList.length
+    ? ` title="${escHtml(r.sanList.join(', '))}"`
+    : ''
+
+  const chainText = r.chainDepth
+    ? `${r.chainDepth} cấp`
+    : '—'
+
+  const hstsTag = r.hsts
+    ? `<span class="tag-hsts-on">HSTS bật</span>`
+    : `<span class="tag-hsts-off">Không HSTS</span>`
+
+  const cipherText = r.cipher ? escHtml(r.cipher) : '—'
+
+  const serialText = r.serialNumber ? escHtml(r.serialNumber) : '—'
+
   const metaRows = r.error
     ? `<div class="card-error-msg">Lỗi: ${escHtml(r.error)}</div>`
     : `
       <div class="meta-row">
         <span class="meta-label">Issuer</span>
         <span class="meta-value">${escHtml(r.issuer || '—')}${selfSignedTag}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">Key</span>
+        <span class="meta-value">${keyText}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">SAN</span>
+        <span class="meta-value"${sanTitle}>${sanText}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">Chuỗi CA</span>
+        <span class="meta-value">${chainText}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">Cipher</span>
+        <span class="meta-value">${cipherText}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">HSTS</span>
+        <span class="meta-value">${hstsTag}</span>
       </div>
       <div class="meta-row">
         <span class="meta-label">Hết hạn</span>
@@ -151,7 +198,11 @@ function renderCard(r) {
       </div>
       <div class="meta-row">
         <span class="meta-label">Protocol</span>
-        <span class="meta-value">${protocolTag || escHtml(r.protocol || '—')}</span>
+        <span class="meta-value">${protocolTag || '—'}</span>
+      </div>
+      <div class="meta-row meta-row-serial">
+        <span class="meta-label">Serial</span>
+        <span class="meta-value meta-serial"${r.serialNumber ? ` title="${escHtml(r.serialNumber)}"` : ''}>${serialText}</span>
       </div>
     `
 
@@ -182,7 +233,7 @@ function updateSummary(results, elapsed) {
   const total   = results.length
   const safe    = results.filter((r) => r.status === 'valid' && !r.selfSigned).length
   const warn    = results.filter((r) =>
-    r.selfSigned || r.status === 'expiring_soon' || r.status === 'warning' || r.status === 'critical'
+    r.selfSigned || r.status === 'expiring_soon' || r.status === 'warning' || r.status === 'weak_key' || r.status === 'critical'
   ).length
   const expired = results.filter((r) => r.status === 'expired' || r.status === 'error').length
 
